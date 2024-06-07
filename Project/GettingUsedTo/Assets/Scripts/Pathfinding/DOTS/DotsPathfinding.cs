@@ -3,13 +3,18 @@ using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 namespace Pathfinding.DOTS
 {
     public class DotsPathfinding : MonoBehaviour
     {
+        [SerializeField] private Tilemap _tilemap;
+        
         private const int MOVE_STRAIGHT_COST = 10;
         private const int MOVE_DIAGONAL_COST = 14;
+        
+        int2 gridSize = new int2(18, 18);
         
         public struct FindPathJob : IJob
         {
@@ -25,17 +30,27 @@ namespace Pathfinding.DOTS
         [ContextMenu("Test")]
         private void Start()
         {
+            var isWalkable = new NativeArray<bool>(gridSize.x * gridSize.y, Allocator.Temp);
+
+            for (int x = 0; x < gridSize.x; x++)
+            {
+                for (int y = 0; y < gridSize.y; y++)
+                {
+                    isWalkable[GetIndex(x, y, gridSize.x)] = !_tilemap.HasTile(new Vector3Int(x, y, 0));
+                }
+            }
+            
             var startTime = Time.realtimeSinceStartup;
             
-            FindPath(new int2(0,0), new int2(40, 40));
+            FindPath(new int2(0,0), new int2(2, 3), isWalkable);
+
+            isWalkable.Dispose();
             
             Debug.Log("Time: " + ((Time.realtimeSinceStartup - startTime) * 1000f));
         }
 
-        private void FindPath(int2 startPos, int2 endPos)
+        private void FindPath(int2 startPos, int2 endPos, NativeArray<bool> isWalkable)
         {
-            int2 gridSize = new int2(100, 100);
-                
             NativeArray<PathNode> pathNodeArray = new NativeArray<PathNode>(gridSize.x * gridSize.y, Allocator.Temp);
 
             for (int x = 0; x < gridSize.x; x++)
@@ -52,12 +67,14 @@ namespace Pathfinding.DOTS
                     pathNode.hCost = CalculateDistanceCost(new int2(x, y), endPos);
                     pathNode.CalcFCost();
 
-                    pathNode.isWalkable = true;
+                    pathNode.isWalkable = isWalkable[pathNode.index];
                     pathNode.previousNodeIndex = -1;
 
                     pathNodeArray[pathNode.index] = pathNode;
                 }
             }
+
+            isWalkable.Dispose();
             
             NativeArray<int2> neighbourOffsetArray = new NativeArray<int2>(new int2[] 
             {
@@ -81,12 +98,8 @@ namespace Pathfinding.DOTS
 
             NativeList<int> openList = new NativeList<int>(Allocator.Temp);
             NativeList<int> closedList = new NativeList<int>(Allocator.Temp);
-
-            NativeHeap<PathNode, PathfindingMin> openSet = new NativeHeap<PathNode, PathfindingMin>(Allocator.Temp);
-            
             
             openList.Add(startNode.index);
-            //openSet.Insert(pathNodeArray[startNode.index]);
 
             while (openList.Length > 0)
             {
@@ -96,6 +109,16 @@ namespace Pathfinding.DOTS
                 if (currentNodeIndex == endPosIndex)
                 {
                     //FOUND SOLUTION
+
+                    var r = CalculatePath(pathNodeArray, endPosIndex);
+                    
+                    foreach (var pos in r)
+                    {
+                        print(pos);
+                    }
+
+                    r.Dispose();
+                    
                     break;
                 }
 
@@ -164,6 +187,29 @@ namespace Pathfinding.DOTS
             pathNodeArray.Dispose();
             openList.Dispose();
             closedList.Dispose();
+        }
+        
+        private NativeList<int2> CalculatePath(NativeArray<PathNode> pathNodeArray, int endPosIndex)
+        {
+            NativeList<int2> path = new NativeList<int2>(Allocator.Temp);
+
+            PathNode endNode = pathNodeArray[endPosIndex];
+                    
+            path.Add(new int2 (endNode.x, endNode.y));
+            
+            PathNode currentNode = endNode;
+                    
+            while (currentNode.previousNodeIndex != -1) {
+                        
+                PathNode cameFromNode = pathNodeArray[currentNode.previousNodeIndex];
+                        
+                path. Add (new int2 (cameFromNode.x, cameFromNode.y)) ;
+                        
+                currentNode = cameFromNode;
+                        
+            }
+            
+            return path;
         }
 
         private bool IsInsideGrid(int2 gridPosition, int2 gridSize)

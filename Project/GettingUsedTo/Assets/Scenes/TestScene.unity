@@ -1723,6 +1723,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07e430ff92b54892997e50ddd35779a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _tilemap: {fileID: 733439219}
 --- !u!4 &1323457130
 Transform:
   m_ObjectHideFlags: 0
