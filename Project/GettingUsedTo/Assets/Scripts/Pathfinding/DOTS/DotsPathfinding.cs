@@ -165,17 +165,7 @@ namespace Pathfinding.DOTS
             }
             else
             {
-                //FOund
-                return;
-                    
-                var r = CalculatePath(pathNodeArray, endPosIndex);
-                    
-                foreach (var pos in r)
-                {
-                    print(pos);
-                }
-
-                r.Dispose();
+               
             }
 
             neighbourOffsetArray.Dispose();
