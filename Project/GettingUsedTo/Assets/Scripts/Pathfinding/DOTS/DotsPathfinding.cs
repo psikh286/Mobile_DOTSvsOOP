@@ -51,6 +51,8 @@ namespace Pathfinding.DOTS
 
         private void FindPath(int2 startPos, int2 endPos, NativeArray<bool> isWalkable)
         {
+            (startPos, endPos) = (endPos, startPos);
+
             NativeArray<PathNode> pathNodeArray = new NativeArray<PathNode>(gridSize.x * gridSize.y, Allocator.Temp);
 
             for (int x = 0; x < gridSize.x; x++)
