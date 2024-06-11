@@ -11,7 +11,7 @@ namespace Pathfinding.DOTS
             if (compare == 0)
                 compare = x.hCost.CompareTo(y.hCost);
 			
-            return -compare;
+            return compare;
         }
     }
     

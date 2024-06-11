@@ -98,29 +98,21 @@ namespace Pathfinding.DOTS
             startNode.CalcFCost();
             pathNodeArray[startNode.index] = startNode;
 
-            NativeList<int> openList = new NativeList<int>(Allocator.Temp);
+            var openSet = new NativeHeap<PathNode, PathfindingMin>(Allocator.Temp, gridSize.x * gridSize.y);
+
             NativeList<int> closedList = new NativeList<int>(Allocator.Temp);
             
-            openList.Add(startNode.index);
+            openSet.Insert(startNode);
 
-            while (openList.Length > 0)
+            while (openSet.Count > 0)
             {
-                int currentNodeIndex = GetLowestFCostNodeIndex(openList, pathNodeArray);
-                PathNode currentNode = pathNodeArray[currentNodeIndex];
+                PathNode currentNode = openSet.Pop();
+                int currentNodeIndex = currentNode.index;
+                
+                closedList.Add(currentNodeIndex);
                 
                 if (currentNodeIndex == endPosIndex)
                     break;
-
-                for (int i = 0; i < openList.Length; i++)
-                {
-                    if(openList[i] != currentNodeIndex)
-                        continue;
-                    
-                    openList.RemoveAtSwapBack(i);
-                    break;
-                }
-                
-                closedList.Add(currentNodeIndex);
 
                 for (int i = 0; i < neighbourOffsetArray.Length; i++)
                 {
@@ -155,9 +147,13 @@ namespace Pathfinding.DOTS
                         pathNodeArray[neighbourNodeIndex] = neighbourNode;
                     }
 
-                    if (!openList.Contains(neighbourNode.index))
+                    if(!openSet.Contains(neighbourNode, out var heapIndex))
                     {
-                        openList.Add(neighbourNode.index);
+                        openSet.Insert(neighbourNode);
+                    }
+                    else if (heapIndex != -1)
+                    {
+                        openSet.UpdateItem(neighbourNode, heapIndex);
                     }
                 }
             }
@@ -169,12 +165,12 @@ namespace Pathfinding.DOTS
             }
             else
             {
-                
+               
             }
 
             neighbourOffsetArray.Dispose();
             pathNodeArray.Dispose();
-            openList.Dispose();
+            openSet.Dispose();
             closedList.Dispose();
         }
         
@@ -218,21 +214,6 @@ namespace Pathfinding.DOTS
             int remaining = math.abs(xDistance - yDistance);
 
             return MOVE_DIAGONAL_COST * math.min(xDistance, yDistance) + MOVE_STRAIGHT_COST * remaining;
-        }
-
-        private int GetLowestFCostNodeIndex(NativeList<int> openList, NativeArray<PathNode> pathNodeArray)
-        {
-            PathNode lowestCostPathNode = pathNodeArray[openList[0]];
-
-            for (int i = 1; i < openList.Length; i++)
-            {
-                PathNode currentNode = pathNodeArray[openList[i]];
-
-                if (currentNode.fCost < lowestCostPathNode.fCost) 
-                    lowestCostPathNode = currentNode;
-            }
-
-            return lowestCostPathNode.index;
         }
     }
 }

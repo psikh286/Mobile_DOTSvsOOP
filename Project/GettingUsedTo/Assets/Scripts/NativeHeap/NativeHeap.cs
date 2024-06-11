@@ -5,6 +5,8 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
+using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace NativeHeap
 {
@@ -43,7 +45,7 @@ namespace NativeHeap
     [DebuggerTypeProxy(typeof(NativeHeapDebugView<,>))]
     [StructLayout(LayoutKind.Sequential)]
     public struct NativeHeap<T, U> : IDisposable
-        where T : unmanaged
+        where T : unmanaged, IEquatable<T>
         where U : unmanaged, IComparer<T> {
 
         #region API
@@ -430,6 +432,43 @@ namespace NativeHeap
             }
         }
 
+        public void UpdateItem(in T t, int heapIndex)
+        {
+            unsafe
+            {
+                var node = Data->Heap[heapIndex];
+                node.Item = t;
+                
+                InsertAndBubbleUp(node, heapIndex);
+            }
+            
+        }
+        
+        public bool Contains(T item, out int heapIndex)
+        {
+            heapIndex = -1;
+            unsafe
+            {
+#if NHEAP_SAFE
+AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
+#endif
+                for (int i = 0; i < Data->Count; i++)
+                {
+                    var node = ReadArrayElement<HeapNode<T>>(Data->Heap, i);
+                    
+                    if (item.Equals(node.Item))
+                    {
+                        heapIndex = i;
+                        return true;
+                    }
+                }
+                
+            }
+            return false;
+        }
+        
+        
+
         #endregion
 
         #region IMPLEMENTATION
@@ -583,7 +622,7 @@ namespace NativeHeap
     }
 
     internal unsafe class NativeHeapDebugView<T, U>
-        where T : unmanaged
+        where T : unmanaged, IEquatable<T>
         where U : unmanaged, IComparer<T> {
 
         private NativeHeap<T, U> _heap;

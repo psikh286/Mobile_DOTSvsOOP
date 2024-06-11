@@ -1,6 +1,8 @@
+using System;
+
 namespace Pathfinding.DOTS
 {
-    public struct PathNode
+    public struct PathNode : IEquatable<PathNode>
     {
         public int x;
         public int y; 
@@ -15,5 +17,20 @@ namespace Pathfinding.DOTS
         public int previousNodeIndex;
 
         public void CalcFCost() => fCost = hCost + gCost;
+
+        public override bool Equals(object obj)
+        {
+            return obj is PathNode other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(x, y);
+        }
+
+        public bool Equals(PathNode other)
+        {
+            return x == other.x && y == other.y;
+        }
     }
 }
