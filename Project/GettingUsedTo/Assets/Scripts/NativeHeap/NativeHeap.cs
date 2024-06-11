@@ -5,8 +5,6 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
-using UnityEngine;
-using Debug = UnityEngine.Debug;
 
 namespace NativeHeap
 {
@@ -504,7 +502,7 @@ AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
             }
 
             DisposeSentinel.Create(out m_Safety, out m_DisposeSentinel, disposeSentinelStackDepth, allocator);
-            Id = Interlocked.Increment(ref NextId);
+            Id = GlobalTypeID.NextID();//Interlocked.Increment(ref NextId);
 #endif
 
             Data = (HeapData<T, U>*)Malloc(SizeOf<HeapData<T, U>>(), AlignOf<HeapData<T, U>>(), allocator);
@@ -671,5 +669,25 @@ AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
         where T : unmanaged {
         public T Item;
         public int TableIndex;
+    }
+
+    internal class GlobalTypeID
+    {
+        internal static int NextID()
+        {
+//todo: this is not guaranteed to be unique, I must swap back to the increment!
+            return Unity.Burst.BurstRuntime.GetHashCode32<int>();
+#pragma warning disable 162
+            return (Interlocked.Increment(ref value.Data) - 1);
+#pragma warning restore 162
+        }
+
+        static GlobalTypeID()
+        {
+            value.Data = 0;
+        }
+
+        static readonly Unity.Burst.SharedStatic<int> value =
+            Unity.Burst.SharedStatic<int>.GetOrCreate<int, GlobalTypeID>();
     }
 }
