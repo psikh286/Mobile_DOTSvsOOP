@@ -109,20 +109,7 @@ namespace Pathfinding.DOTS
                 PathNode currentNode = pathNodeArray[currentNodeIndex];
                 
                 if (currentNodeIndex == endPosIndex)
-                {
-                    //FOUND SOLUTION
-
-                    var r = CalculatePath(pathNodeArray, endPosIndex);
-                    
-                    foreach (var pos in r)
-                    {
-                        print(pos);
-                    }
-
-                    r.Dispose();
-                    
                     break;
-                }
 
                 for (int i = 0; i < openList.Length; i++)
                 {
@@ -173,16 +160,16 @@ namespace Pathfinding.DOTS
                         openList.Add(neighbourNode.index);
                     }
                 }
-
-                PathNode endNode = pathNodeArray[endPosIndex];
-                if (endNode.previousNodeIndex == -1) 
-                {
-                    //DIDNT
-                }
-                else
-                {
-                    //FOund
-                }
+            }
+            
+            PathNode endNode = pathNodeArray[endPosIndex];
+            if (endNode.previousNodeIndex == -1) 
+            {
+                //DIDNT
+            }
+            else
+            {
+                
             }
 
             neighbourOffsetArray.Dispose();
