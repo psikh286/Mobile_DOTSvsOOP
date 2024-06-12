@@ -41,14 +41,16 @@ namespace Pathfinding.OOP
 
 					int newMovementCostToNeighbour = currentNode.gCost + GetDistance(currentNode, neighbour);
 
-					if (newMovementCostToNeighbour >= neighbour.gCost && _openSet.Contains(neighbour)) 
+					var neighbourContained = _openSet.Contains(neighbour);
+					
+					if (newMovementCostToNeighbour >= neighbour.gCost && neighbourContained) 
 						continue;
 					
 					neighbour.gCost = newMovementCostToNeighbour;
 					neighbour.hCost = GetDistance(neighbour, targetNode);
 					neighbour.parent = currentNode;
 
-					if (!_openSet.Contains(neighbour))
+					if (!neighbourContained)
 						_openSet.Add(neighbour);
 					else
 						_openSet.UpdateItem(neighbour);

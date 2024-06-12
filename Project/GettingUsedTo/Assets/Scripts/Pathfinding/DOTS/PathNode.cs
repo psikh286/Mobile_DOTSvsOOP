@@ -18,19 +18,9 @@ namespace Pathfinding.DOTS
 
         public void CalcFCost() => fCost = hCost + gCost;
 
-        public override bool Equals(object obj)
-        {
-            return obj is PathNode other && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(x, y);
-        }
-
-        public bool Equals(PathNode other)
-        {
-            return x == other.x && y == other.y;
-        }
+        public override bool Equals(object obj) => obj is PathNode other && Equals(other);
+        public override int GetHashCode() => HashCode.Combine(index);
+        public bool Equals(PathNode other) => index == other.index;
     }
+    
 }

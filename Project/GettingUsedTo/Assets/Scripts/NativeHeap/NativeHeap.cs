@@ -464,6 +464,30 @@ AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
             }
             return false;
         }
+
+        public void InsertOrUpdate(T item)
+        {
+            unsafe
+            {
+#if NHEAP_SAFE
+AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
+#endif
+                for (int i = 0; i < Data->Count; i++)
+                {
+                    var node = ReadArrayElement<HeapNode<T>>(Data->Heap, i);
+                    
+                    if (item.Equals(node.Item))
+                    {
+                        node.Item = item;
+                
+                        InsertAndBubbleUp(node, i);
+                    }
+                }
+                
+            }
+
+            Insert(item);
+        }
         
         
 

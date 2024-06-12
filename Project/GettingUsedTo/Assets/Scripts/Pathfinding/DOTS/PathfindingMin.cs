@@ -4,7 +4,7 @@ namespace Pathfinding.DOTS
 {
     public struct PathfindingMin : IComparer<PathNode>
     {
-        public int Compare(PathNode x, PathNode y)
+        public int Compare(PathNode x,PathNode y)
         {
             int compare = x.fCost.CompareTo(y.fCost);
 			
