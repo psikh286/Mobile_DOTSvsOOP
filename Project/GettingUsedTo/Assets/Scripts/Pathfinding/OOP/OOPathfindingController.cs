@@ -33,7 +33,6 @@ namespace Pathfinding.OOP
             public SpriteRenderer spriteRenderer;
             public List<Vector2> path;
             public int nodeCount;
-            public bool inProgress;
             public CarColor color;
         }
         
@@ -41,7 +40,6 @@ namespace Pathfinding.OOP
         [SerializeField] private ObjectOrientedPathfinding _pathfinding;
         [SerializeField] private Vector2[] _spawnersPositions;
         [SerializeField] private ColorData[] _colorData;
-        [SerializeField] private bool _allowCoupling;
 
         [Header("Temp")] 
         [SerializeField] private float _carSpeed;
@@ -79,12 +77,9 @@ namespace Pathfinding.OOP
             {
                 _agents[i] = new Agent()
                 {
-                    spriteRenderer = Instantiate(_agentPrefab, GetSpawnPosition(), Quaternion.identity),
-                    path = new List<Vector2>(),
-                    color = (CarColor)Random.Range(1, 4)
+                    spriteRenderer = Instantiate(_agentPrefab, Vector3.one * - 10f, Quaternion.identity),
+                    path = new List<Vector2>()
                 };
-
-                _agents[i].spriteRenderer.sprite = GetCarSprite(_agents[i].color);
             }
         }
 
@@ -92,38 +87,32 @@ namespace Pathfinding.OOP
         {
             for (var i = 0; i < _agents.Length; i++)
             {
-                if (_agents[i].inProgress)
+                if (_agents[i].nodeCount >= _agents[i].path.Count)
                 {
-                    if (_agents[i].nodeCount >= _agents[i].path.Count)
-                    {
-                        _agents[i].inProgress = false;
-                        _agents[i].nodeCount = 0;
-                        _agents[i].path = new List<Vector2>();
-                        _agents[i].color = (CarColor)Random.Range(1, 4);
+                    _agents[i].nodeCount = 0;
+                    _agents[i].color = (CarColor)Random.Range(1, 4);
                         
-                        _agents[i].spriteRenderer.sprite = GetCarSprite(_agents[i].color);
-                        _agents[i].spriteRenderer.transform.position = GetSpawnPosition();
-                        return;
-                    }
-                    
-                    var moveTo = Vector3.MoveTowards(_agents[i].spriteRenderer.transform.position, _agents[i].path[_agents[i].nodeCount], _carSpeed * Time.deltaTime);
-
-                    _agents[i].spriteRenderer.flipX = moveTo.x < _agents[i].spriteRenderer.transform.position.x;
-                    
-                    _agents[i].spriteRenderer.transform.position = moveTo;
-                    
-                    if (_agents[i].spriteRenderer.transform.position == (Vector3)_agents[i].path[_agents[i].nodeCount])
-                        _agents[i].nodeCount++;
-                }
-                else
-                {
+                    _agents[i].spriteRenderer.sprite = GetCarSprite(_agents[i].color);
+                    _agents[i].spriteRenderer.transform.position = GetSpawnPosition();
+                        
                     var pos = _agents[i].spriteRenderer.transform.position;
                     var dest = GetDestinationPosition(_agents[i].color);
                     var path = _pathfinding.FindPath((int)pos.x, (int)pos.y, dest.x, dest.y);
 
                     _agents[i].path = path;
-                    _agents[i].inProgress = path != null;
+                    
+                    if(path == null)
+                        return;
                 }
+                    
+                var moveTo = Vector3.MoveTowards(_agents[i].spriteRenderer.transform.position, _agents[i].path[_agents[i].nodeCount], _carSpeed * Time.deltaTime);
+
+                _agents[i].spriteRenderer.flipX = moveTo.x < _agents[i].spriteRenderer.transform.position.x;
+                    
+                _agents[i].spriteRenderer.transform.position = moveTo;
+                    
+                if (_agents[i].spriteRenderer.transform.position == (Vector3)_agents[i].path[_agents[i].nodeCount])
+                    _agents[i].nodeCount++;
             }
         }
         
