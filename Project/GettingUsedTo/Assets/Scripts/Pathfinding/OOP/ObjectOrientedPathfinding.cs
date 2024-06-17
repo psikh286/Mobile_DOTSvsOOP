@@ -10,9 +10,13 @@ namespace Pathfinding.OOP
 		private BinaryHeap<PathfindingNode> _openSet;
 		private readonly HashSet<PathfindingNode> _closedSet = new();
 		
-		public void Init() => _openSet = new BinaryHeap<PathfindingNode>(_grid.MaxSize);
+		public void Init()
+		{
+			_grid.Init();
+			_openSet = new BinaryHeap<PathfindingNode>(_grid.MaxSize);
+		}
 
-		public List<PathfindingNode> FindPath( int startPosX, int startPosY, int endPosX, int endPosY)
+		public List<Vector2> FindPath( int startPosX, int startPosY, int endPosX, int endPosY)
 		{
 			//reversed to avoid reversing path list after
 			PathfindingNode startNode = _grid.NodeFromCoords(endPosX, endPosY);
@@ -60,13 +64,13 @@ namespace Pathfinding.OOP
 			return null;
 		}
 
-		private List<PathfindingNode> RetracePath(PathfindingNode startNode, PathfindingNode endNode) 
+		private List<Vector2> RetracePath(PathfindingNode startNode, PathfindingNode endNode) 
 		{
-			List<PathfindingNode> path = new List<PathfindingNode>();
+			List<Vector2> path = new List<Vector2>();
 			PathfindingNode currentNode = endNode;
 
 			while (currentNode != startNode) {
-				path.Add(currentNode);
+				path.Add(new Vector2(currentNode.gridX, currentNode.gridY));
 				currentNode = currentNode.parent;
 			}
 			

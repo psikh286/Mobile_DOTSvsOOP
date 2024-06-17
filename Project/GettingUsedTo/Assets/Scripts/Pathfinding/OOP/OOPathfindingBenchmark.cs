@@ -16,11 +16,10 @@ namespace Pathfinding.OOP
 
         [SerializeField] private bool _drawPath;
 
-        private List<PathfindingNode> _path;
+        private List<Vector2> _path;
         
         private void Start()
         {
-            _grid.Init();
             _pathfinding.Init();
         }
 
@@ -28,12 +27,6 @@ namespace Pathfinding.OOP
         {
             if(Input.GetKeyDown(KeyCode.Space))
                 Test();
-
-            if (Input.GetKeyDown(KeyCode.Alpha1))
-            {
-                _grid.Init();
-                print("Grid recreated");
-            }
         }
 
         [ContextMenu("Test")]
@@ -58,7 +51,7 @@ namespace Pathfinding.OOP
 
             for (var i = 0; i < _path.Count; i++)
             {
-                Vector3 pos = new Vector3(_path[i].gridX, _path[i].gridY, 0f);
+                Vector3 pos = new Vector3(_path[i].x, _path[i].y, 0f);
 
                 if (i == 0)
                 {
@@ -80,7 +73,7 @@ namespace Pathfinding.OOP
                     return;
                 }
                 
-                Gizmos.DrawLine(pos, new Vector3(_path[i+1].gridX, _path[i+1].gridY, 0f));
+                Gizmos.DrawLine(pos, new Vector3(_path[i+1].x, _path[i+1].y, 0f));
             }
         }
     }

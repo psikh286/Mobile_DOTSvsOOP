@@ -10,13 +10,14 @@ namespace Pathfinding.OOP
 		
 		[SerializeField] private Vector2 _gridWorldSize;
 		[SerializeField] private Tilemap _tilemap;
+		[SerializeField] private bool _allowDiagonal;
 		
 		private PathfindingNode[,] _grid;
 
 
 		private int _gridSizeX;
 		private int _gridSizeY;
-		
+
 		public void Init() 
 		{
 			_gridSizeX = Mathf.RoundToInt(_gridWorldSize.x);
@@ -30,9 +31,9 @@ namespace Pathfinding.OOP
 
 			for (int x = 0; x < _gridSizeX; x ++) 
 			{
-				for (int y = 0; y < _gridSizeY; y ++) 
+				for (int y = 0; y < _gridSizeY; y ++)
 				{
-					_grid[x, y] = new PathfindingNode(!_tilemap.HasTile( new Vector3Int(x, y, 0)), x, y);
+					_grid[x, y] = new PathfindingNode(_tilemap.HasTile(new Vector3Int(x, y, 0)), x, y);
 				}
 			}
 		}
@@ -43,17 +44,36 @@ namespace Pathfinding.OOP
 		{
 			List<PathfindingNode> neighbours = new List<PathfindingNode>();
 
-			for (int x = -1; x <= 1; x++) {
-				for (int y = -1; y <= 1; y++) {
-					if (x == 0 && y == 0)
-						continue;
 
-					int checkX = node.gridX + x;
-					int checkY = node.gridY + y;
+			if (_allowDiagonal)
+			{
+				for (int x = -1; x <= 1; x++) 
+				{
+					for (int y = -1; y <= 1; y++) 
+					{
+						if (x == 0 && y == 0)
+							continue;
 
-					if (checkX >= 0 && checkX < _gridSizeX && checkY >= 0 && checkY < _gridSizeY) {
-						neighbours.Add(_grid[checkX,checkY]);
+						int checkX = node.gridX + x;
+						int checkY = node.gridY + y;
+
+						if (checkX >= 0 && checkX < _gridSizeX && checkY >= 0 && checkY < _gridSizeY)
+							neighbours.Add(_grid[checkX, checkY]);
 					}
+				}
+			}
+			else
+			{
+				int[] dx = { -1, 1, 0, 0 };
+				int[] dy = { 0, 0, -1, 1 };
+
+				for (int i = 0; i < 4; i++) 
+				{
+					int checkX = node.gridX + dx[i];
+					int checkY = node.gridY + dy[i];
+
+					if (checkX >= 0 && checkX < _gridSizeX && checkY >= 0 && checkY < _gridSizeY)
+						neighbours.Add(_grid[checkX, checkY]);
 				}
 			}
 
