@@ -2440,21 +2440,73 @@ MonoBehaviour:
   - {x: 45, y: 3}
   - {x: 33, y: 0}
   - {x: 4, y: 0}
-  _destinationPositions:
-  - color: {r: 1, g: 0, b: 0, a: 1}
+  _colorData:
+  - color: {r: 1, g: 0.5358716, b: 0, a: 1}
+    carColor: 1
     pos:
-      x: 15
-      y: 20
-  - color: {r: 1, g: 0.49801764, b: 0, a: 1}
-    pos:
-      x: 23
+    - x: 4
       y: 9
-  - color: {r: 0, g: 0.41398382, b: 1, a: 1}
+    - x: 6
+      y: 4
+    - x: 6
+      y: 14
+    - x: 11
+      y: 20
+    - x: 16
+      y: 2
+    - x: 16
+      y: 16
+    - x: 23
+      y: 9
+    sprites:
+    - {fileID: 444513719, guid: 8e512a16f29c547baa988fbd04d27341, type: 3}
+    - {fileID: 1584543356, guid: 8e512a16f29c547baa988fbd04d27341, type: 3}
+    - {fileID: 1165234418, guid: 8e512a16f29c547baa988fbd04d27341, type: 3}
+  - color: {r: 1, g: 0, b: 0, a: 1}
+    carColor: 2
     pos:
-      x: 23
+    - x: 4
+      y: 4
+    - x: 5
+      y: 8
+    - x: 7
+      y: 20
+    - x: 10
+      y: 16
+    - x: 14
+      y: 2
+    - x: 15
+      y: 20
+    - x: 25
       y: 6
-  _carSpeed: 15
-  _capacity: 25
+    sprites:
+    - {fileID: 1001116692, guid: 8e512a16f29c547baa988fbd04d27341, type: 3}
+    - {fileID: -966145713, guid: 8e512a16f29c547baa988fbd04d27341, type: 3}
+    - {fileID: 1356693136, guid: 8e512a16f29c547baa988fbd04d27341, type: 3}
+  - color: {r: 0, g: 0.19600487, b: 1, a: 1}
+    carColor: 3
+    pos:
+    - x: 4
+      y: 15
+    - x: 7
+      y: 12
+    - x: 8
+      y: 16
+    - x: 14
+      y: 16
+    - x: 18
+      y: 2
+    - x: 23
+      y: 6
+    - x: 40
+      y: 12
+    sprites:
+    - {fileID: 1061269936, guid: 8e512a16f29c547baa988fbd04d27341, type: 3}
+    - {fileID: 1642345644, guid: 8e512a16f29c547baa988fbd04d27341, type: 3}
+    - {fileID: -172355496, guid: 8e512a16f29c547baa988fbd04d27341, type: 3}
+  _buildingTilemap: {fileID: 21940399}
+  _carSpeed: 10
+  _capacity: 10
 --- !u!4 &948887234
 Transform:
   m_ObjectHideFlags: 0

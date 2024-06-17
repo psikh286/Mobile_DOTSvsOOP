@@ -1,8 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using Unity.Mathematics;
-using UnityEditor.Playables;
 using UnityEngine;
-using UnityEngine.Pool;
+using UnityEngine.Tilemaps;
 using Random = UnityEngine.Random;
 
 namespace Pathfinding.OOP
@@ -11,31 +12,60 @@ namespace Pathfinding.OOP
     public class OOPathfindingController : MonoBehaviour
     {
         [System.Serializable]
-        private struct ColorBuildingData
+        private struct ColorData
         {
             public Color color;
-            public int2 pos;
+            public CarColor carColor;
+            public int2[] pos;
+            public Sprite[] sprites;
         }
         
-        private class AgentData
+        private enum CarColor : byte
         {
-            public List<Vector2> path = new();
+            None = 0,
+            Orange = 1,
+            Red = 2,
+            Blue =3,
+        }
+        
+        private struct Agent
+        {
+            public SpriteRenderer spriteRenderer;
+            public List<Vector2> path;
             public int nodeCount;
             public bool inProgress;
+            public CarColor color;
         }
         
         [SerializeField] private SpriteRenderer _agentPrefab;
         [SerializeField] private ObjectOrientedPathfinding _pathfinding;
         [SerializeField] private Vector2[] _spawnersPositions;
-        [SerializeField] private ColorBuildingData[] _destinationPositions;
+        [SerializeField] private ColorData[] _colorData;
+        [SerializeField] private bool _allowCoupling;
 
         [Header("Temp")] 
         [SerializeField] private float _carSpeed;
         [SerializeField] private int _capacity;
-
-        private SpriteRenderer[] _agents;
-        private AgentData[] _agentData;
         
+        [SerializeField] private Tilemap _buildingTilemap;
+
+        private Agent[] _agents;
+        
+        private Dictionary<CarColor, int2[]> _buildingPositions;
+        private Dictionary<CarColor, Sprite[]> _carSprites;
+        
+
+        private void Awake()
+        {
+            _buildingPositions = new Dictionary<CarColor, int2[]>();
+            _carSprites = new Dictionary<CarColor, Sprite[]>();
+            
+            foreach (var data in _colorData)
+            {
+                _buildingPositions.Add(data.carColor, data.pos);
+                _carSprites.Add(data.carColor, data.sprites);
+            }
+        }
         
         private void Start()
         {
@@ -43,14 +73,18 @@ namespace Pathfinding.OOP
             
             Random.InitState(7);
 
-            _agents = new SpriteRenderer[_capacity];
-            _agentData = new AgentData[_capacity];
+            _agents = new Agent[_capacity];
             
             for (int i = 0; i < _capacity; i++)
             {
-                _agents[i] = Instantiate(_agentPrefab, GetSpawnPosition(), Quaternion.identity);
-                _agentData[i] = new AgentData();
-                
+                _agents[i] = new Agent()
+                {
+                    spriteRenderer = Instantiate(_agentPrefab, GetSpawnPosition(), Quaternion.identity),
+                    path = new List<Vector2>(),
+                    color = (CarColor)Random.Range(1, 4)
+                };
+
+                _agents[i].spriteRenderer.sprite = GetCarSprite(_agents[i].color);
             }
         }
 
@@ -58,37 +92,67 @@ namespace Pathfinding.OOP
         {
             for (var i = 0; i < _agents.Length; i++)
             {
-                if (_agentData[i].inProgress)
+                if (_agents[i].inProgress)
                 {
-                    if (_agentData[i].nodeCount >= _agentData[i].path.Count)
+                    if (_agents[i].nodeCount >= _agents[i].path.Count)
                     {
-                        _agentData[i] = new AgentData();
-                        _agents[i].transform.position = GetSpawnPosition();
+                        _agents[i].inProgress = false;
+                        _agents[i].nodeCount = 0;
+                        _agents[i].path = new List<Vector2>();
+                        _agents[i].color = (CarColor)Random.Range(1, 4);
+                        
+                        _agents[i].spriteRenderer.sprite = GetCarSprite(_agents[i].color);
+                        _agents[i].spriteRenderer.transform.position = GetSpawnPosition();
                         return;
                     }
                     
-                    _agents[i].transform.position = Vector3.MoveTowards(_agents[i].transform.position, _agentData[i].path[_agentData[i].nodeCount], _carSpeed * Time.deltaTime);
+                    var moveTo = Vector3.MoveTowards(_agents[i].spriteRenderer.transform.position, _agents[i].path[_agents[i].nodeCount], _carSpeed * Time.deltaTime);
+
+                    _agents[i].spriteRenderer.flipX = moveTo.x < _agents[i].spriteRenderer.transform.position.x;
                     
-                    if (_agents[i].transform.position == (Vector3)_agentData[i].path[_agentData[i].nodeCount])
-                        _agentData[i].nodeCount++;
+                    _agents[i].spriteRenderer.transform.position = moveTo;
+                    
+                    if (_agents[i].spriteRenderer.transform.position == (Vector3)_agents[i].path[_agents[i].nodeCount])
+                        _agents[i].nodeCount++;
                 }
                 else
                 {
-                    var pos = _agents[i].transform.position;
-                    var dest = GetDestinationPosition();
+                    var pos = _agents[i].spriteRenderer.transform.position;
+                    var dest = GetDestinationPosition(_agents[i].color);
                     var path = _pathfinding.FindPath((int)pos.x, (int)pos.y, dest.x, dest.y);
-                    
-                    _agentData[i].path = path;
-                    _agentData[i].inProgress = true;
+
+                    _agents[i].path = path;
+                    _agents[i].inProgress = path != null;
                 }
             }
         }
+        
 
-        private Vector2 GetSpawnPosition() => _spawnersPositions[Mathf.RoundToInt(Random.value *  (_spawnersPositions.Length - 1))];
-        private int2 GetDestinationPosition()
+        private Vector2 GetSpawnPosition()
         {
-            return _destinationPositions[Mathf.RoundToInt(Random.value * (_destinationPositions.Length - 1))].pos;
+            return _spawnersPositions[Mathf.RoundToInt(Random.value * (_spawnersPositions.Length - 1))];
         }
+
+        private int2 GetDestinationPosition(CarColor color)
+        {
+            if (_buildingPositions.TryGetValue(color, out var positions))
+                return positions[Mathf.RoundToInt(Random.value * (positions.Length - 1))];
+            
+            
+            Debug.LogError($"[OOPathfindingController] couldn't find a destination with color: {color}");
+            return new int2(-1, -1);
+        }
+
+        private Sprite GetCarSprite(CarColor color)
+        {
+            if (_carSprites.TryGetValue(color, out var sprites))
+                return sprites[Mathf.RoundToInt(Random.value * (sprites.Length - 1))];
+            
+            
+            Debug.LogError($"[OOPathfindingController] couldn't find a sprite with color: {color}");
+            return null;
+        }
+        
 
         private void OnDrawGizmosSelected()
         {
@@ -123,13 +187,17 @@ namespace Pathfinding.OOP
             
             void DrawBuildings()
             {
-                if(_destinationPositions == null || _destinationPositions.Length == 0)
+                if(_colorData == null || _colorData.Length == 0)
                     return;
 
-                for (var i = 0; i < _destinationPositions.Length; i++)
+                for (var i = 0; i < _colorData.Length; i++)
                 {
-                    Gizmos.color = _destinationPositions[i].color;
-                    Gizmos.DrawWireCube(new Vector3(_destinationPositions[i].pos.x, _destinationPositions[i].pos.y, 0f), Vector3.one);
+                    Gizmos.color = _colorData[i].color;
+                    
+                    for (var j = 0; j < _colorData[i].pos.Length; j++)
+                    {
+                        Gizmos.DrawWireCube(new Vector3(_colorData[i].pos[j].x, _colorData[i].pos[j].y, 0f), Vector3.one);
+                    }
                 }
             }
             
@@ -138,7 +206,7 @@ namespace Pathfinding.OOP
                 float halfWidth = size / 2;
                 float halfHeight = size / 2;
 
-                return new Vector3[]
+                return new[]
                 {
                     labelPosition + new Vector3(-halfWidth, -halfHeight, 0),
                     labelPosition + new Vector3(halfWidth, -halfHeight, 0),
@@ -147,5 +215,60 @@ namespace Pathfinding.OOP
                 };
             }
         }
+
+#if UNITY_EDITOR
+        
+        [ContextMenu("FillBuildings")]
+        private void FillBuildings()
+        {
+            for (int x = 0; x < 100; x++)
+            {
+                for (int y = 0; y < 100; y++)
+                {
+                    var pos = new Vector3Int(x, y);
+                    
+                    if(!_buildingTilemap.HasTile(pos))
+                        continue;
+                    
+                    var id= int.Parse(Regex.Match(_buildingTilemap.GetSprite(pos).name, @"\d+").Value);
+
+                    switch (id)
+                    {
+                        case >= 80 and <= 87:
+                        {
+                            AddItem(0);
+                            continue;
+                        }
+                        case >= 62 and <= 69:
+                        {
+                            AddItem(1);
+                            continue;
+                        }
+                        case >= 44 and <= 51:
+                        {
+                            AddItem(2);
+                            continue;
+                        }
+                    }
+
+                    continue;
+
+                    void AddItem(int i)
+                    {
+                        var list = _colorData[i].pos.ToList();
+                        
+                        if (list.Contains(new int2(x, y)))
+                            return;
+                        
+                        list.Add(new int2(x, y));
+                        _colorData[i].pos = list.ToArray();
+                    }
+                }
+            }
+            
+            UnityEditor.EditorUtility.SetDirty(this);
+        }
+        
+#endif
     }
 }
