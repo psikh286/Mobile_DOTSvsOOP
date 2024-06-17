@@ -70,13 +70,15 @@ namespace Pathfinding.OOP
                 _carSprites.Add(data.carColor, data.sprites);
             }
         }
-        
-        private void Start()
-        {
-            _pathfinding.Init();
-            
-            Random.InitState(7);
 
+        public void Init()
+        {
+            enabled = true;
+            _pathfinding.Init();
+            Random.InitState(PathfindingSettings.Seed);
+
+            _capacity = PathfindingSettings.AgentsCount;
+            _coupleNumber = PathfindingSettings.AgentsPerCouple;
             _agents = new Agent[_capacity];
             
             for (int i = 0; i < _capacity; i++)
@@ -88,7 +90,7 @@ namespace Pathfinding.OOP
                 };
             }
         }
-
+        
         private void Update()
         {
             for (var i = 0; i < _agents.Length; i++)
@@ -156,7 +158,8 @@ namespace Pathfinding.OOP
             return null;
         }
         
-
+#if UNITY_EDITOR
+        
         private void OnDrawGizmosSelected()
         {
             DrawSpawners();
@@ -218,8 +221,6 @@ namespace Pathfinding.OOP
                 };
             }
         }
-
-#if UNITY_EDITOR
         
         [ContextMenu("FillBuildings")]
         private void FillBuildings()

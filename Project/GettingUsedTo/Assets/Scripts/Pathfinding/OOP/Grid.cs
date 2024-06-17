@@ -18,8 +18,9 @@ namespace Pathfinding.OOP
 		private int _gridSizeX;
 		private int _gridSizeY;
 
-		public void Init() 
+		public void Init()
 		{
+			_allowDiagonal = PathfindingSettings.AllowDiagonal;
 			_gridSizeX = Mathf.RoundToInt(_gridWorldSize.x);
 			_gridSizeY = Mathf.RoundToInt(_gridWorldSize.y);
 			CreateGrid();

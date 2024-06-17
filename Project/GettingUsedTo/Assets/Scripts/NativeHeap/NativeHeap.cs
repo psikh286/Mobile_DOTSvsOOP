@@ -447,7 +447,7 @@ namespace NativeHeap
             heapIndex = -1;
             unsafe
             {
-#if NHEAP_SAFE
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
 AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
 #endif
                 for (int i = 0; i < Data->Count; i++)
@@ -469,7 +469,7 @@ AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
         {
             unsafe
             {
-#if NHEAP_SAFE
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
 AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
 #endif
                 for (int i = 0; i < Data->Count; i++)
@@ -616,8 +616,10 @@ AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
             Data->Table[node.TableIndex].HeapIndex = insertIndex;
         }
 
+
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]
         internal unsafe void IsValidIndexInternal(NativeHeapIndex index, ref bool result, ref int errorCode) {
+#if ENABLE_UNITY_COLLECTIONS_CHECKS
             AtomicSafetyHandle.CheckReadAndThrow(m_Safety);
 
             if (index.StructureId != Id) {
@@ -638,7 +640,10 @@ AtomicSafetyHandle.CheckWriteAndThrow(m_Safety);
                 result = false;
                 return;
             }
+#endif
         }
+
+        
 
         #endregion
     }
