@@ -2410,6 +2410,7 @@ GameObject:
   - component: {fileID: 948887233}
   - component: {fileID: 948887236}
   - component: {fileID: 948887235}
+  - component: {fileID: 948887237}
   m_Layer: 0
   m_Name: Controller
   m_TagString: Untagged
@@ -2424,7 +2425,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 948887232}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9d7d24d3638da4cfc8dd6f8cb0db6fd5, type: 3}
   m_Name: 
@@ -2504,9 +2505,9 @@ MonoBehaviour:
     - {fileID: 1061269936, guid: 8e512a16f29c547baa988fbd04d27341, type: 3}
     - {fileID: 1642345644, guid: 8e512a16f29c547baa988fbd04d27341, type: 3}
     - {fileID: -172355496, guid: 8e512a16f29c547baa988fbd04d27341, type: 3}
-  _buildingTilemap: {fileID: 21940399}
   _carSpeed: 10
-  _capacity: 10
+  _capacity: 10000
+  _buildingTilemap: {fileID: 21940399}
 --- !u!4 &948887234
 Transform:
   m_ObjectHideFlags: 0
@@ -2537,6 +2538,7 @@ MonoBehaviour:
   _gridWorldSize: {x: 50, y: 50}
   _tilemap: {fileID: 1134055659}
   _allowDiagonal: 0
+  _tilesWalkable: 1
 --- !u!114 &948887236
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2550,6 +2552,97 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _grid: {fileID: 948887235}
+--- !u!114 &948887237
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 948887232}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34d6cd72a7244a949f3521fbb07576f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _agentPrefab: {fileID: 3596475159611572508, guid: f134f00482cca4e7ebd473dc440da4d4,
+    type: 3}
+  _pathfinding: {fileID: 948887236}
+  _spawnersPositions:
+  - {x: 0, y: 6}
+  - {x: 23, y: 24}
+  - {x: 29, y: 24}
+  - {x: 46, y: 15}
+  - {x: 45, y: 3}
+  - {x: 33, y: 0}
+  - {x: 4, y: 0}
+  _colorData:
+  - color: {r: 1, g: 0.5358716, b: 0, a: 1}
+    carColor: 1
+    pos:
+    - x: 4
+      y: 9
+    - x: 6
+      y: 4
+    - x: 6
+      y: 14
+    - x: 11
+      y: 20
+    - x: 16
+      y: 2
+    - x: 16
+      y: 16
+    - x: 23
+      y: 9
+    sprites:
+    - {fileID: 444513719, guid: 8e512a16f29c547baa988fbd04d27341, type: 3}
+    - {fileID: 1584543356, guid: 8e512a16f29c547baa988fbd04d27341, type: 3}
+    - {fileID: 1165234418, guid: 8e512a16f29c547baa988fbd04d27341, type: 3}
+  - color: {r: 1, g: 0, b: 0, a: 1}
+    carColor: 2
+    pos:
+    - x: 4
+      y: 4
+    - x: 5
+      y: 8
+    - x: 7
+      y: 20
+    - x: 10
+      y: 16
+    - x: 14
+      y: 2
+    - x: 15
+      y: 20
+    - x: 25
+      y: 6
+    sprites:
+    - {fileID: 1001116692, guid: 8e512a16f29c547baa988fbd04d27341, type: 3}
+    - {fileID: -966145713, guid: 8e512a16f29c547baa988fbd04d27341, type: 3}
+    - {fileID: 1356693136, guid: 8e512a16f29c547baa988fbd04d27341, type: 3}
+  - color: {r: 0, g: 0.19600487, b: 1, a: 1}
+    carColor: 3
+    pos:
+    - x: 4
+      y: 15
+    - x: 7
+      y: 12
+    - x: 8
+      y: 16
+    - x: 14
+      y: 16
+    - x: 18
+      y: 2
+    - x: 23
+      y: 6
+    - x: 40
+      y: 12
+    sprites:
+    - {fileID: 1061269936, guid: 8e512a16f29c547baa988fbd04d27341, type: 3}
+    - {fileID: 1642345644, guid: 8e512a16f29c547baa988fbd04d27341, type: 3}
+    - {fileID: -172355496, guid: 8e512a16f29c547baa988fbd04d27341, type: 3}
+  _carSpeed: 10
+  _capacity: 10000
+  _coupleNumber: 1000
+  _buildingTilemap: {fileID: 21940399}
 --- !u!1 &1134055656
 GameObject:
   m_ObjectHideFlags: 0
