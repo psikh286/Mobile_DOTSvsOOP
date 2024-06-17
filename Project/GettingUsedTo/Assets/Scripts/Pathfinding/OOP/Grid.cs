@@ -11,9 +11,9 @@ namespace Pathfinding.OOP
 		[SerializeField] private Vector2 _gridWorldSize;
 		[SerializeField] private Tilemap _tilemap;
 		[SerializeField] private bool _allowDiagonal;
+		[SerializeField] private bool _tilesWalkable;
 		
 		private PathfindingNode[,] _grid;
-
 
 		private int _gridSizeX;
 		private int _gridSizeY;
@@ -33,7 +33,7 @@ namespace Pathfinding.OOP
 			{
 				for (int y = 0; y < _gridSizeY; y ++)
 				{
-					_grid[x, y] = new PathfindingNode(_tilemap.HasTile(new Vector3Int(x, y, 0)), x, y);
+					_grid[x, y] = new PathfindingNode(_tilesWalkable == _tilemap.HasTile(new Vector3Int(x, y, 0)), x, y);
 				}
 			}
 		}
