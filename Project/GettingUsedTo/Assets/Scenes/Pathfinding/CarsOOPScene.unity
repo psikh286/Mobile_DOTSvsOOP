@@ -2407,9 +2407,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 948887234}
-  - component: {fileID: 948887233}
+  - component: {fileID: 948887238}
   - component: {fileID: 948887236}
   - component: {fileID: 948887235}
+  - component: {fileID: 948887233}
   - component: {fileID: 948887237}
   m_Layer: 0
   m_Name: Controller
@@ -2643,6 +2644,20 @@ MonoBehaviour:
   _capacity: 10000
   _coupleNumber: 1000
   _buildingTilemap: {fileID: 21940399}
+--- !u!114 &948887238
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 948887232}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08f3287c088147f6aa891cece22545f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _controller: {fileID: 948887233}
+  _coupledController: {fileID: 948887237}
 --- !u!1 &1134055656
 GameObject:
   m_ObjectHideFlags: 0

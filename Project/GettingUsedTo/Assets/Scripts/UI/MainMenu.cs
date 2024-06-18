@@ -74,7 +74,15 @@ namespace UI
         [SerializeField] private Sprite _couplingNoCarSprite;
 
         [Header("Last Page")] 
+        [SerializeField] private GameObject _groupNumberParent;
+        [SerializeField] private TMP_InputField _agentsNumberField;
+        [SerializeField] private TMP_InputField _groupNumberField;
+        [SerializeField] private TMP_InputField _seedField;
         [SerializeField] private Button _actualPlayButton;
+
+        [Header("Limits")] 
+        [SerializeField] private int _agentNumberLimit;
+        [SerializeField] private int _groupNumberLimit;
         
         private bool _lightThemeOn;
 
@@ -83,9 +91,9 @@ namespace UI
         private bool _diagonalsAllowed;
         private bool _couplingAllowed;
         
-        private int _agentCount;
-        private int _agentsPerCouple;
-        private int _seed;
+        private int _agentCount = 1000;
+        private int _agentsPerCouple = 10;
+        private int _seed = 772;
 
         private void Awake()
         {
@@ -108,6 +116,8 @@ namespace UI
             _settingsInfoCloseButton.onClick.AddListener(() => _settingsInfoParent.SetActive(false));
             
             _actualPlayButton.onClick.AddListener(OnTestStart);
+            
+            
             
             _oopButton.onClick.AddListener(() =>
             {
@@ -145,16 +155,39 @@ namespace UI
                 OnCouplingOpened();
             });
             
-            _couplingYesButton.onClick.AddListener(() =>
+            _couplingNoButton.onClick.AddListener(() =>
             {
                 _couplingAllowed = false;
                 OnLastPageOpened();
             });
             
-            _couplingNoButton.onClick.AddListener(() =>
+            _couplingYesButton.onClick.AddListener(() =>
             {
                 _couplingAllowed = true;
                 OnLastPageOpened();
+            });
+            
+            
+            
+            _agentsNumberField.onSubmit.AddListener(text =>
+            {
+                var count= Mathf.Clamp(int.Parse(text), 0, _agentNumberLimit);
+                
+                _agentsNumberField.text = $"{count}";
+                _agentCount = count;
+            });
+            
+            _groupNumberField.onSubmit.AddListener(text =>
+            {
+                var count= Mathf.Clamp(int.Parse(text), 0, _groupNumberLimit);
+                
+                _groupNumberField.text = $"{count}";
+                _agentsPerCouple = count;
+            });
+            
+            _seedField.onSubmit.AddListener(text =>
+            {
+                _seed = int.Parse(text);
             });
         }
         
@@ -179,6 +212,10 @@ namespace UI
             _diagonalNoButton.onClick.RemoveAllListeners();
             _couplingYesButton.onClick.RemoveAllListeners();
             _couplingNoButton.onClick.RemoveAllListeners();
+            
+            _agentsNumberField.onSubmit.RemoveAllListeners();
+            _groupNumberField.onSubmit.RemoveAllListeners();
+            _seedField.onSubmit.RemoveAllListeners();
         }
 
         #region Main Menu
@@ -288,12 +325,17 @@ namespace UI
         {
             _lastPageParent.SetActive(true);
             _couplingParent.SetActive(false);
+            _groupNumberParent.SetActive(_couplingAllowed);
             
             _settingsBackButton.onClick.RemoveAllListeners();
             _settingsBackButton.onClick.AddListener(OnCouplingOpened);
             
             _settingsHeaderText.text = "Settings";
             _settingsInfoText.text = "1. Number: how many agents";
+
+            _agentsNumberField.text = $"{_agentCount}";
+            _groupNumberField.text = $"{_agentsPerCouple}";
+            _seedField.text = $"{_seed}";
         }
 
         #endregion
