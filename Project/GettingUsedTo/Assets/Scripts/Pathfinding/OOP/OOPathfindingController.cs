@@ -99,11 +99,11 @@ namespace Pathfinding.OOP
                     var pos = _agents[i].spriteRenderer.transform.position;
                     var dest = GetDestinationPosition(_agents[i].color);
                     var path = _pathfinding.FindPath((int)pos.x, (int)pos.y, dest.x, dest.y);
-
-                    _agents[i].path = path;
                     
                     if(path == null)
                         return;
+                    
+                    _agents[i].path = path;
                 }
                     
                 var moveTo = Vector3.MoveTowards(_agents[i].spriteRenderer.transform.position, _agents[i].path[_agents[i].nodeCount], _carSpeed * Time.deltaTime);

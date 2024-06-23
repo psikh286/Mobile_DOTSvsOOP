@@ -169,23 +169,23 @@ namespace UI
             
             
             
-            _agentsNumberField.onSubmit.AddListener(text =>
+            _agentsNumberField.onValueChanged.AddListener(text =>
             {
-                var count= Mathf.Clamp(int.Parse(text), 0, _agentNumberLimit);
+                var count= Mathf.Clamp(int.Parse(text), 1, _agentNumberLimit);
                 
                 _agentsNumberField.text = $"{count}";
                 _agentCount = count;
             });
             
-            _groupNumberField.onSubmit.AddListener(text =>
+            _groupNumberField.onValueChanged.AddListener(text =>
             {
-                var count= Mathf.Clamp(int.Parse(text), 0, _groupNumberLimit);
+                var count= Mathf.Clamp(int.Parse(text), 2, _groupNumberLimit);
                 
                 _groupNumberField.text = $"{count}";
                 _agentsPerCouple = count;
             });
             
-            _seedField.onSubmit.AddListener(text =>
+            _seedField.onValueChanged.AddListener(text =>
             {
                 _seed = int.Parse(text);
             });
@@ -213,9 +213,9 @@ namespace UI
             _couplingYesButton.onClick.RemoveAllListeners();
             _couplingNoButton.onClick.RemoveAllListeners();
             
-            _agentsNumberField.onSubmit.RemoveAllListeners();
-            _groupNumberField.onSubmit.RemoveAllListeners();
-            _seedField.onSubmit.RemoveAllListeners();
+            _agentsNumberField.onValueChanged.RemoveAllListeners();
+            _groupNumberField.onValueChanged.RemoveAllListeners();
+            _seedField.onValueChanged.RemoveAllListeners();
         }
 
         #region Main Menu

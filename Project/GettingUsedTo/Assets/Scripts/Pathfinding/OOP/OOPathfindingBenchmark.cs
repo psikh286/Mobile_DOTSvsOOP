@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Unity.Mathematics;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace Pathfinding.OOP
 {
@@ -26,22 +27,20 @@ namespace Pathfinding.OOP
         private void Update()
         {
             if(Input.GetKeyDown(KeyCode.Space))
-                Test();
+                InvokeRepeating(nameof(Test), 1f, 3f);
         }
 
         [ContextMenu("Test")]
         private void Test()
-        {
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
+        { 
+            float startTime = Time.realtimeSinceStartup;
 
-            for (int i = 0; i < 10000; i++)
+            for (int i = 0; i < 5; i++)
             {
                 _path = _pathfinding.FindPath(startPos.x, startPos.y, endPos.x, endPos.y);
             }
             
-            sw.Stop();
-            print(sw.ElapsedMilliseconds);
+            Debug.Log("Time: " + ((Time.realtimeSinceStartup - startTime) * 1000f));
         }
 
         private void OnDrawGizmos()

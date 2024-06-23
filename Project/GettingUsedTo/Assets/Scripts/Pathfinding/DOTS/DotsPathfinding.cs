@@ -58,7 +58,7 @@ namespace Pathfinding.DOTS
                 FindPathJob findPathJob = new FindPathJob 
                 { 
                     startPos = new int2(0, 0), 
-                    endPos = new int2(12, 6),
+                    endPos = new int2(3, 3),
                     gridSize = _gridSize,
                     pathNodeArray = new NativeArray<PathNode>(_pathNodeArray, Allocator.TempJob)
                 };
