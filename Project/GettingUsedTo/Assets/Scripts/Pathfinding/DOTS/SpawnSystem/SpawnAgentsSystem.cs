@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using Pathfinding.DOTS.ColorCoding;
+using Pathfinding.DOTS.Coupling;
 using Pathfinding.DOTS.DotsSettings;
 using Pathfinding.DOTS.MoveSystem;
 using Pathfinding.DOTS.Path;
@@ -44,6 +45,10 @@ namespace Pathfinding.DOTS.SpawnSystem
                     random = new Random((uint)(i + 1) * settings.seed),
                     spriteRandom = new Random((uint)(i + 1) * settings.seed),
                 });
+                
+                if (settings.allowCoupling) 
+                    ecb.AddComponent(entity, new CoupleTag());
+
                 ecb.AddBuffer<PathPosition>(entity);
             }
 

@@ -57,7 +57,8 @@ namespace Pathfinding.OOP
         private int2 _currentDestinationPosition;
         private Sprite _currentSprite;
 
-        private Random _random = new(PathfindingSettings.Seed);
+        private Random[] _movingRandoms;
+        private Random[] _spriteRandoms;
         
 
         private void Awake()
@@ -79,7 +80,10 @@ namespace Pathfinding.OOP
 
             _capacity = PathfindingSettings.AgentsCount;
             _coupleNumber = PathfindingSettings.AgentsPerCouple;
+            
             _agents = new Agent[_capacity];
+            _movingRandoms = new Random[_capacity];
+            _spriteRandoms = new Random[_capacity];
             
             for (int i = 0; i < _capacity; i++)
             {
@@ -88,6 +92,9 @@ namespace Pathfinding.OOP
                     spriteRenderer = Instantiate(_agentPrefab, Vector3.one * -10f, Quaternion.identity),
                     path = new List<Vector2>(),
                 };
+                
+                _movingRandoms[i] = new Random(PathfindingSettings.Seed * (uint)(i + 1));
+                _spriteRandoms[i] = new Random(PathfindingSettings.Seed * (uint)(i + 1));
             }
         }
         
@@ -99,10 +106,10 @@ namespace Pathfinding.OOP
                 {
                     if (i % _coupleNumber == 0)
                     {
-                        _currentColor = (CarColor)_random.NextInt(1, 4);
-                        _currentSprite = GetCarSprite(_currentColor);
-                        _currentSpawnPosition = GetSpawnPosition();
-                        _currentDestinationPosition = GetDestinationPosition(_currentColor);
+                        _currentColor = (CarColor)_movingRandoms[i].NextInt(1, 4);
+                        _currentSprite = GetCarSprite(_currentColor, i);
+                        _currentSpawnPosition = _spawnersPositions[_movingRandoms[i].NextInt(_spawnersPositions.Length)];
+                        _currentDestinationPosition = GetDestinationPosition(_currentColor, i);
                     }
                     
                     _agents[i].nodeCount = 0;
@@ -135,25 +142,20 @@ namespace Pathfinding.OOP
         }
         
 
-        private Vector2 GetSpawnPosition()
-        {
-            return _spawnersPositions[_random.NextInt(_spawnersPositions.Length)];
-        }
-
-        private int2 GetDestinationPosition(CarColor color)
+        private int2 GetDestinationPosition(CarColor color, int i)
         {
             if (_buildingPositions.TryGetValue(color, out var positions))
-                return positions[_random.NextInt(positions.Length)];
+                return positions[_movingRandoms[i].NextInt(positions.Length)];
             
             
             Debug.LogError($"[OOPathfindingController] couldn't find a destination with color: {color}");
             return new int2(-1, -1);
         }
 
-        private Sprite GetCarSprite(CarColor color)
+        private Sprite GetCarSprite(CarColor color, int i)
         {
             if (_carSprites.TryGetValue(color, out var sprites))
-                return sprites[_random.NextInt(sprites.Length)];
+                return sprites[_spriteRandoms[i].NextInt(sprites.Length)];
             
             
             Debug.LogError($"[OOPathfindingController] couldn't find a sprite with color: {color}");
