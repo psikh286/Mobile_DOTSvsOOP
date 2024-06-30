@@ -198,7 +198,7 @@ namespace UI
                 if (seed == 0)
                     seed = 1;
                 
-                _groupNumberField.text = $"{seed}";
+                _seedField.text = $"{seed}";
                 
                 _seed = seed;
             });
