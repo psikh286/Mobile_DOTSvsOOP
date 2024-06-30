@@ -34,7 +34,7 @@ namespace Pathfinding.DOTS.MoveSystem
         [ReadOnly] public float deltaTime;
         
         [BurstCompile]
-        public void Execute(ref LocalTransform localTransform, ref MovementData movementData, in DynamicBuffer<PathPosition> nodes, EnabledRefRW<ReachedFinish> reachedFinish,  EnabledRefRW<HasColorDefined> colorDefined)//, EnabledRefRW<HasSpriteApplied> spriteApplied)
+        public void Execute(ref LocalTransform localTransform, ref MovementData movementData, in DynamicBuffer<PathPosition> nodes, EnabledRefRW<ReachedFinish> reachedFinish,  EnabledRefRW<HasColorDefined> colorDefined, EnabledRefRW<HasSpriteApplied> spriteApplied)
         {
             if(reachedFinish.ValueRO)
                 return;
@@ -43,7 +43,7 @@ namespace Pathfinding.DOTS.MoveSystem
             {
                 reachedFinish.ValueRW = true;
                 colorDefined.ValueRW = false;
-                //spriteApplied.ValueRW = false;
+                spriteApplied.ValueRW = false;
                 movementData.index = 0;
                 return;
             }

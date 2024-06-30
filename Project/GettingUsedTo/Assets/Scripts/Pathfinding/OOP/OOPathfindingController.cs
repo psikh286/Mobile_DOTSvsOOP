@@ -98,7 +98,6 @@ namespace Pathfinding.OOP
                     _agents[i].nodeCount = 0;
                     _agents[i].color = (CarColor)_movingRandoms[i].NextInt(1, 4);
 
-                    
                     var pos = _spawnersPositions[_movingRandoms[i].NextInt(_spawnersPositions.Length)];
                     var dest = GetDestinationPosition(_agents[i].color, i);
                     var path = _pathfinding.FindPath((int)pos.x, (int)pos.y, dest.x, dest.y);

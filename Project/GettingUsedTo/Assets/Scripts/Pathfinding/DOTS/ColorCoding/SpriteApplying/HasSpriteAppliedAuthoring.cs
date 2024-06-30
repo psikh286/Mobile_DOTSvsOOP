@@ -9,7 +9,6 @@ namespace Pathfinding.DOTS.ColorCoding.SpriteApplying
         {
             public override void Bake(HasSpriteAppliedAuthoring authoring)
             {
-                return;
                 var entity = GetEntity(TransformUsageFlags.Dynamic);
                 AddComponent<HasSpriteApplied>(entity);
                 SetComponentEnabled<HasSpriteApplied>(entity, false);
