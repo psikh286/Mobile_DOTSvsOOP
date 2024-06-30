@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using Random = UnityEngine.Random;
+using Random = Unity.Mathematics.Random;
 
 namespace Pathfinding.OOP
 {
@@ -43,16 +43,17 @@ namespace Pathfinding.OOP
 
         [Header("Temp")] 
         [SerializeField] private float _carSpeed;
-        [SerializeField] private int _capacity;
+        private int _capacity;
         
-        [SerializeField] private Tilemap _buildingTilemap;
 
         private Agent[] _agents;
         
         private Dictionary<CarColor, int2[]> _buildingPositions;
         private Dictionary<CarColor, Sprite[]> _carSprites;
         
-
+        private Random[] _movingRandoms;
+        private Random[] _spriteRandoms;
+        
         private void Awake()
         {
             _buildingPositions = new Dictionary<CarColor, int2[]>();
@@ -69,10 +70,11 @@ namespace Pathfinding.OOP
         {
             enabled = true;
             _pathfinding.Init();
-            Random.InitState(PathfindingSettings.Seed);
 
             _capacity = PathfindingSettings.AgentsCount;
             _agents = new Agent[_capacity];
+            _movingRandoms = new Random[_capacity];
+            _spriteRandoms = new Random[_capacity];
             
             for (int i = 0; i < _capacity; i++)
             {
@@ -81,6 +83,9 @@ namespace Pathfinding.OOP
                     spriteRenderer = Instantiate(_agentPrefab, Vector3.one * - 10f, Quaternion.identity),
                     path = new List<Vector2>()
                 };
+
+                _movingRandoms[i] = new Random(PathfindingSettings.Seed * (uint)(i + 1));
+                _spriteRandoms[i] = new Random(PathfindingSettings.Seed * (uint)(i + 1));
             }
         }
 
@@ -91,18 +96,21 @@ namespace Pathfinding.OOP
                 if (_agents[i].nodeCount >= _agents[i].path.Count)
                 {
                     _agents[i].nodeCount = 0;
-                    _agents[i].color = (CarColor)Random.Range(1, 4);
-                        
-                    _agents[i].spriteRenderer.sprite = GetCarSprite(_agents[i].color);
-                    _agents[i].spriteRenderer.transform.position = GetSpawnPosition();
-                        
-                    var pos = _agents[i].spriteRenderer.transform.position;
-                    var dest = GetDestinationPosition(_agents[i].color);
+                    _agents[i].color = (CarColor)_movingRandoms[i].NextInt(1, 4);
+
+                    
+                    var pos = _spawnersPositions[_movingRandoms[i].NextInt(_spawnersPositions.Length)];
+                    var dest = GetDestinationPosition(_agents[i].color, i);
                     var path = _pathfinding.FindPath((int)pos.x, (int)pos.y, dest.x, dest.y);
                     
-                    if(path == null)
-                        return;
+                    if (path == null)
+                    {
+                        _agents[i].path = new List<Vector2>(0);
+                        continue;
+                    }
                     
+                    _agents[i].spriteRenderer.sprite = GetCarSprite(_agents[i].color, i);
+                    _agents[i].spriteRenderer.transform.position = pos;
                     _agents[i].path = path;
                 }
                     
@@ -118,25 +126,21 @@ namespace Pathfinding.OOP
         }
         
 
-        private Vector2 GetSpawnPosition()
-        {
-            return _spawnersPositions[Mathf.RoundToInt(Random.value * (_spawnersPositions.Length - 1))];
-        }
 
-        private int2 GetDestinationPosition(CarColor color)
+        private int2 GetDestinationPosition(CarColor color, int i)
         {
             if (_buildingPositions.TryGetValue(color, out var positions))
-                return positions[Mathf.RoundToInt(Random.value * (positions.Length - 1))];
+                return positions[_movingRandoms[i].NextInt(positions.Length)];
             
             
             Debug.LogError($"[OOPathfindingController] couldn't find a destination with color: {color}");
             return new int2(-1, -1);
         }
 
-        private Sprite GetCarSprite(CarColor color)
+        private Sprite GetCarSprite(CarColor color, int i)
         {
             if (_carSprites.TryGetValue(color, out var sprites))
-                return sprites[Mathf.RoundToInt(Random.value * (sprites.Length - 1))];
+                return sprites[_spriteRandoms[i].NextInt(sprites.Length)];
             
             
             Debug.LogError($"[OOPathfindingController] couldn't find a sprite with color: {color}");
@@ -207,6 +211,8 @@ namespace Pathfinding.OOP
             }
         }
         
+        [SerializeField] private Tilemap _buildingTilemap;
+        
         [ContextMenu("FillBuildings")]
         private void FillBuildings()
         {
@@ -223,17 +229,17 @@ namespace Pathfinding.OOP
 
                     switch (id)
                     {
-                        case >= 80 and <= 87:
+                        case >= 80 and <= 89:
                         {
                             AddItem(0);
                             continue;
                         }
-                        case >= 62 and <= 69:
+                        case >= 62 and <= 71:
                         {
                             AddItem(1);
                             continue;
                         }
-                        case >= 44 and <= 51:
+                        case (>= 44 and <= 53):
                         {
                             AddItem(2);
                             continue;

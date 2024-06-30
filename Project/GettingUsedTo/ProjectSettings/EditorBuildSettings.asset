@@ -11,4 +11,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Pathfinding/OOP_Cars_Scene.unity
     guid: e2034265edf1b4e2988cd613c78db46f
+  - enabled: 1
+    path: Assets/Scenes/Pathfinding/DOTS_Cars_Scene.unity
+    guid: 38afda94331994e0899e766e92eeb73c
+  - enabled: 1
+    path: Assets/Scenes/Pathfinding/OOP_Boats_Scene.unity
+    guid: a9a5c7397fbe44afd83beec8a8ada888
+  - enabled: 1
+    path: Assets/Scenes/Pathfinding/DOTS_Boats_Scene.unity
+    guid: 54f90e4782e6345b0b65232c1160f578
   m_configObjects: {}

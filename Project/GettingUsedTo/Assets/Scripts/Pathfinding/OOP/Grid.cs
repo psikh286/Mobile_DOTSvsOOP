@@ -39,7 +39,18 @@ namespace Pathfinding.OOP
 			}
 		}
 		
-		public PathfindingNode NodeFromCoords(int x, int y) => _grid[x,y];
+		public PathfindingNode NodeFromCoords(int x, int y)
+		{
+			try
+			{
+				return _grid[x, y];
+			}
+			catch
+			{
+				print($"{x} {y}");
+				return null;
+			}
+		}
 
 		public List<PathfindingNode> GetNeighbours(PathfindingNode node) 
 		{

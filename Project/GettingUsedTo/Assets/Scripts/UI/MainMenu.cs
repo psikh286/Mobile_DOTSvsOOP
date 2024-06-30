@@ -1,5 +1,9 @@
+using Helpers;
 using Pathfinding;
+using Pathfinding.DOTS.DotsSettings;
+using Pathfinding.DOTS.SpawnSystem;
 using TMPro;
+using Unity.Entities;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -93,7 +97,7 @@ namespace UI
         
         private int _agentCount = 1000;
         private int _agentsPerCouple = 10;
-        private int _seed = 772;
+        private uint _seed = 772;
 
         private void Awake()
         {
@@ -102,6 +106,8 @@ namespace UI
                 _lightThemeOn = PlayerPrefs.GetInt("Theme") == 0;
                 OnSwitchTheme();
             }
+            
+            World.DefaultGameObjectInjectionWorld.Unmanaged.GetExistingSystemState<SpawnAgentsSystem>().Enabled = true;
             
             _switchThemeButton.onClick.AddListener(OnSwitchTheme);
             
@@ -187,7 +193,14 @@ namespace UI
             
             _seedField.onValueChanged.AddListener(text =>
             {
-                _seed = int.Parse(text);
+                uint seed = uint.Parse(text);
+
+                if (seed == 0)
+                    seed = 1;
+                
+                _groupNumberField.text = $"{seed}";
+                
+                _seed = seed;
             });
         }
         
@@ -348,10 +361,12 @@ namespace UI
             PathfindingSettings.AgentsPerCouple = _agentsPerCouple;
             PathfindingSettings.Seed = _seed;
             
+            DataTransferHelper.CreateOrUpdateData();
+            
             int sceneIndex = 1;
 
             sceneIndex += _dotsSelected ? 1 : 0;
-            sceneIndex += _carsSelected ? 0 : 1;
+            sceneIndex += _carsSelected ? 0 : 2;
             
             SceneManager.LoadScene(sceneIndex);
         }
