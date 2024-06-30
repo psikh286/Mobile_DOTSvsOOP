@@ -24,7 +24,7 @@ namespace Pathfinding.DOTS.ColorCoding.SpriteApplying
             
             int GetRandomIndexFrom2DArray(int x, int arrayLength, ref IndividualRandomData randomData)
             {
-                var randomIndex = randomData.random.NextInt(arrayLength);
+                var randomIndex = randomData.spriteRandom.NextInt(arrayLength);
                 return x + randomIndex - (randomIndex % 3);
             }
         }

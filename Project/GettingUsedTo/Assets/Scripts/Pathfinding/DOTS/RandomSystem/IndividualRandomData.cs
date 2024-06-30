@@ -1,9 +1,11 @@
 using Unity.Entities;
+using Unity.Mathematics;
 
 namespace Pathfinding.DOTS.RandomSystem
 {
     public struct IndividualRandomData : IComponentData
     {
-        public Unity.Mathematics.Random random;
+        public Random random;
+        public Random spriteRandom;
     }
 }

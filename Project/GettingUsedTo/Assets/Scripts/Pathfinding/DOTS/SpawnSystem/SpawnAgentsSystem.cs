@@ -39,7 +39,11 @@ namespace Pathfinding.DOTS.SpawnSystem
                 ecb.SetComponent(entity, LocalTransform.FromPosition(-1f, -1f, 0f));
                 ecb.AddComponent(entity, new PathData());
                 ecb.AddComponent(entity, new MovementData());
-                ecb.AddComponent(entity, new IndividualRandomData(){random = new Random((uint)(i + 1) * settings.seed)});
+                ecb.AddComponent(entity, new IndividualRandomData
+                {
+                    random = new Random((uint)(i + 1) * settings.seed),
+                    spriteRandom = new Random((uint)(i + 1) * settings.seed),
+                });
                 ecb.AddBuffer<PathPosition>(entity);
             }
 
