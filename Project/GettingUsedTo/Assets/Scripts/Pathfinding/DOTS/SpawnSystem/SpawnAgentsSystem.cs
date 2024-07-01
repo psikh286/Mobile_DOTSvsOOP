@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using Pathfinding.DOTS.ColorCoding;
+using Pathfinding.DOTS.Coupling;
 using Pathfinding.DOTS.Debug;
 using Pathfinding.DOTS.DotsSettings;
 using Pathfinding.DOTS.MoveSystem;
@@ -25,7 +26,7 @@ namespace Pathfinding.DOTS.SpawnSystem
             state.RequireForUpdate<SettingsData>();
             state.RequireForUpdate<SpawnerConfigData>();
             
-            timePassed = 0f;
+            timePassed = 1f;
         }
         
         [BurstCompile]
@@ -40,9 +41,14 @@ namespace Pathfinding.DOTS.SpawnSystem
                 return;
             
             timePassed -= 1f;
-            
-            if (totalAmountSpawned >= settings.agentsCount) 
+
+            if (totalAmountSpawned >= settings.agentsCount)
+            {
+                timePassed = 1f;
+                totalAmountSpawned = 0;
                 state.Enabled = false;
+                return;
+            }
             
             var ecb = new EntityCommandBuffer(Allocator.Persistent);
             
@@ -62,6 +68,11 @@ namespace Pathfinding.DOTS.SpawnSystem
                     random = new Random((uint)(i + 1) * settings.seed),
                     spriteRandom = new Random((uint)(i + 1) * settings.seed),
                 });
+                
+                if (settings.allowCoupling) 
+                    ecb.AddComponent(entity, new CoupleTag());
+
+                
                 ecb.AddBuffer<PathPosition>(entity);
             }
 
