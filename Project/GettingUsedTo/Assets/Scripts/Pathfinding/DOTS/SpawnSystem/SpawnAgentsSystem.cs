@@ -30,13 +30,13 @@ namespace Pathfinding.DOTS.SpawnSystem
             var config = SystemAPI.GetSingleton<SpawnerConfigData>();
             var settings = SystemAPI.GetSingleton<SettingsData>();
 
-            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.Temp);
+            var ecb = new EntityCommandBuffer(Allocator.Temp);
 
             for (int i = 0; i < settings.agentsCount; i++)
             {
                 Entity entity =  ecb.Instantiate(config.prefabEntity);
                 
-                ecb.SetComponent(entity, LocalTransform.FromPosition(-1f, -1f, 0f));
+                ecb.SetComponent(entity, LocalTransform.FromPosition(10f, 10f, 0f));
                 ecb.AddComponent(entity, new PathData());
                 ecb.AddComponent(entity, new MovementData());
                 ecb.AddComponent(entity, new IndividualRandomData
@@ -48,6 +48,7 @@ namespace Pathfinding.DOTS.SpawnSystem
             }
 
             ecb.Playback(state.EntityManager);
+            ecb.Dispose();
         }
     }
 }

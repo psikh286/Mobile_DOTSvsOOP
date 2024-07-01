@@ -177,7 +177,7 @@ namespace UI
             
             _agentsNumberField.onValueChanged.AddListener(text =>
             {
-                var count= Mathf.Clamp(int.Parse(text), 1, _agentNumberLimit);
+                var count= Mathf.Clamp(int.Parse(text), 0, _agentNumberLimit);
                 
                 _agentsNumberField.text = $"{count}";
                 _agentCount = count;

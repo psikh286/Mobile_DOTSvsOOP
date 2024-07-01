@@ -53,8 +53,11 @@ namespace Pathfinding.DOTS.PathfindingSystem
         [ReadOnly] public BlobAssetReference<GridDataBlobAsset> isWalkable;
         
         [BurstCompile]
-        public void Execute(in PathData pathData, ref DynamicBuffer<PathPosition> pathPositionBuffer, EnabledRefRW<ReachedFinish> reachedFinish)
+        public void Execute(in PathData pathData, ref DynamicBuffer<PathPosition> pathPositionBuffer, EnabledRefRW<ReachedFinish> reachedFinish, [EntityIndexInQuery] in int i)
         {
+            if(i >= 1000)
+                return;
+            
             int2 startPos = pathData.endPos;
             int2 endPos = pathData.startPos;
 

@@ -14,6 +14,7 @@ namespace Pathfinding.DOTS.ColorCoding.SpriteApplying
 
         public void OnUpdate(ref SystemState state)
         {
+            return;
             var spritesData = SystemAPI.ManagedAPI.GetSingleton<ColorSpritesData>();
 
             foreach (var (spriteRenderer, pathData, randomData, hasSpriteApplied) in SystemAPI.Query<SystemAPI.ManagedAPI.UnityEngineComponent<SpriteRenderer>, RefRO<PathData>, RefRW<IndividualRandomData>, EnabledRefRW<HasSpriteApplied>>().WithAll<HasColorDefined>().WithDisabled<HasSpriteApplied>())
