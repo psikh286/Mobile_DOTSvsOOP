@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using Pathfinding.DOTS.ColorCoding;
+using Pathfinding.DOTS.Debug;
 using Pathfinding.DOTS.DotsSettings;
 using Pathfinding.DOTS.MoveSystem;
 using Pathfinding.DOTS.Path;
@@ -16,23 +17,40 @@ namespace Pathfinding.DOTS.SpawnSystem
     [StructLayout(LayoutKind.Auto)]
     public partial struct SpawnAgentsSystem : ISystem
     {
+        private float timePassed;
+        private int totalAmountSpawned;
+        
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<SettingsData>();
             state.RequireForUpdate<SpawnerConfigData>();
+            
+            timePassed = 0f;
         }
-
+        
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            state.Enabled = false;
-
             var config = SystemAPI.GetSingleton<SpawnerConfigData>();
             var settings = SystemAPI.GetSingleton<SettingsData>();
 
-            var ecb = new EntityCommandBuffer(Allocator.Temp);
-
-            for (int i = 0; i < settings.agentsCount; i++)
+            timePassed += SystemAPI.Time.DeltaTime;
+            
+            if (timePassed < 1f) 
+                return;
+            
+            timePassed -= 1f;
+            
+            if (totalAmountSpawned >= settings.agentsCount) 
+                state.Enabled = false;
+            
+            var ecb = new EntityCommandBuffer(Allocator.Persistent);
+            
+            var totalAmountLeft = settings.agentsCount - totalAmountSpawned;
+            var amountToSpawn = math.min(totalAmountLeft, 1000);
+            totalAmountSpawned += amountToSpawn;
+            
+            for (int i = 0; i < amountToSpawn; i++)
             {
                 Entity entity =  ecb.Instantiate(config.prefabEntity);
                 

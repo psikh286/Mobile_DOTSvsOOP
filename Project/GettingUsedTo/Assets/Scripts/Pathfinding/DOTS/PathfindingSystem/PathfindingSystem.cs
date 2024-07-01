@@ -2,7 +2,6 @@ using System.Runtime.InteropServices;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
-using NativeHeap;
 using Pathfinding.DOTS.ColorCoding;
 using Pathfinding.DOTS.DotsSettings;
 using Pathfinding.DOTS.Grid;
@@ -28,7 +27,7 @@ namespace Pathfinding.DOTS.PathfindingSystem
             var grid = SystemAPI.GetSingleton<GridData>();
             var settings = SystemAPI.GetSingleton<SettingsData>();
             
-            var job = new PathfindingJob()
+            var job = new PathfindingListJob()
             {
                 isWalkable = grid.blobAssetReference,
                 gridSize = grid.gridSize,
@@ -42,7 +41,7 @@ namespace Pathfinding.DOTS.PathfindingSystem
     [BurstCompile]
     [StructLayout(LayoutKind.Auto)]
     [WithAll(typeof(HasColorDefined))]
-    public partial struct PathfindingJob : IJobEntity
+    public partial struct PathfindingListJob : IJobEntity
     {
         private const int moveStraightCost = 10;
         private const int moveDiagonalCost = 14;
@@ -53,11 +52,8 @@ namespace Pathfinding.DOTS.PathfindingSystem
         [ReadOnly] public BlobAssetReference<GridDataBlobAsset> isWalkable;
         
         [BurstCompile]
-        public void Execute(in PathData pathData, ref DynamicBuffer<PathPosition> pathPositionBuffer, EnabledRefRW<ReachedFinish> reachedFinish, [EntityIndexInQuery] in int i)
+        public void Execute(in PathData pathData, ref DynamicBuffer<PathPosition> pathPositionBuffer, EnabledRefRW<ReachedFinish> reachedFinish)
         {
-            if(i >= 1000)
-                return;
-            
             int2 startPos = pathData.endPos;
             int2 endPos = pathData.startPos;
 
@@ -89,20 +85,34 @@ namespace Pathfinding.DOTS.PathfindingSystem
             startNode.CalcFCost();
             pathNodeArray[startNode.index] = startNode;
         
-            NativeHeap<PathNode, PathfindingMin> openSet = new NativeHeap<PathNode, PathfindingMin>(Allocator.Temp, gridSize.x * gridSize.y);
+            //NativeHeap<PathNode, PathfindingMin> openSet = new NativeHeap<PathNode, PathfindingMin>(Allocator.Temp, gridSize.x * gridSize.y);
+            
+            NativeList<int> openList = new NativeList<int>(gridSize.x * gridSize.y, Allocator.Temp);
             NativeHashSet<int> closedList = new NativeHashSet<int>(gridSize.x * gridSize.y, Allocator.Temp);
             
-            openSet.Insert(startNode);
+            //openSet.Insert(startNode);
+            openList.Add(startNode.index);
         
-            while (openSet.Count > 0)
+            while (openList.Length > 0)
             {
-                PathNode currentNode = openSet.Pop();
-                int currentNodeIndex = currentNode.index;
+               // PathNode currentNode = openSet.Pop();
+                int currentNodeIndex = GetLowestCostFNodeIndex(openList, pathNodeArray);
+                PathNode currentNode = pathNodeArray[currentNodeIndex];
                 
-                closedList.Add(currentNodeIndex);
                 
                 if (currentNodeIndex == endPosIndex)
                     break;
+                
+                for (int j = 0; j < openList.Length; j++) 
+                {
+                    if (openList[j] == currentNodeIndex)
+                    {
+                        openList.RemoveAtSwapBack(j);
+                        break;
+                    }
+                }
+                
+                closedList.Add(currentNodeIndex);
                 
                 for (int x = -1; x <= 1; x++)
                 {
@@ -115,8 +125,7 @@ namespace Pathfinding.DOTS.PathfindingSystem
                             continue;
                         
                         int2 neighbourOffset = new int2(x, y);
-                        int2 neighbourPosition =
-                            new int2(currentNode.x + neighbourOffset.x, currentNode.y + neighbourOffset.y);
+                        int2 neighbourPosition = new int2(currentNode.x + neighbourOffset.x, currentNode.y + neighbourOffset.y);
         
                         if (!IsInsideGrid(neighbourPosition, gridSize))
                             continue;
@@ -145,8 +154,13 @@ namespace Pathfinding.DOTS.PathfindingSystem
                         neighbourNode.CalcFCost();
                         
                         pathNodeArray[neighbourNodeIndex] = neighbourNode;
+
+                        if (!openList.Contains(neighbourNode.index))
+                        {
+                            openList.Add(neighbourNode.index);
+                        }
                         
-                        openSet.InsertOrUpdate(neighbourNode);
+                        //openSet.InsertOrUpdate(neighbourNode);
                     }
                 }
             }
@@ -162,8 +176,24 @@ namespace Pathfinding.DOTS.PathfindingSystem
                 reachedFinish.ValueRW = false;
             }
 
-            openSet.Dispose();
+            //openSet.Dispose();
+            openList.Dispose();
             closedList.Dispose();
+        }
+        
+        private int GetLowestCostFNodeIndex(NativeList<int> openList, NativeArray<PathNode> pathNodeArray)
+        {
+            var lowestCostPathNode = pathNodeArray[openList[0]];
+            
+            for (int i = 1; i < openList.Length; i++) 
+            {
+                PathNode testPathNode = pathNodeArray[openList[i]];
+                
+                if (testPathNode.fCost < lowestCostPathNode.fCost) 
+                    lowestCostPathNode = testPathNode;
+            }
+
+            return lowestCostPathNode.index;
         }
         
         #region Helper

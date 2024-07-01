@@ -8866,7 +8866,7 @@ MonoBehaviour:
     - {fileID: 1061269936, guid: 8e512a16f29c547baa988fbd04d27341, type: 3}
     - {fileID: 1642345644, guid: 8e512a16f29c547baa988fbd04d27341, type: 3}
     - {fileID: -172355496, guid: 8e512a16f29c547baa988fbd04d27341, type: 3}
-  _carSpeed: 10
+  _carSpeed: 5
   _buildingTilemap: {fileID: 21940399}
 --- !u!4 &1306258989
 Transform:
@@ -31203,7 +31203,7 @@ MonoBehaviour:
     - {fileID: 1061269936, guid: 8e512a16f29c547baa988fbd04d27341, type: 3}
     - {fileID: 1642345644, guid: 8e512a16f29c547baa988fbd04d27341, type: 3}
     - {fileID: -172355496, guid: 8e512a16f29c547baa988fbd04d27341, type: 3}
-  _carSpeed: 10
+  _carSpeed: 5
   _buildingTilemap: {fileID: 21940399}
 --- !u!4 &1816903074
 Transform:
