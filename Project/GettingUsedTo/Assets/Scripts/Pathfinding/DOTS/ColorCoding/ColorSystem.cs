@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using Pathfinding.DOTS.ColorCoding.ColorMapData;
+using Pathfinding.DOTS.Coupling;
 using Pathfinding.DOTS.RandomSystem;
 using Unity.Burst;
 using Unity.Collections;
@@ -33,6 +34,7 @@ namespace Pathfinding.DOTS.ColorCoding
         [BurstCompile]
         [StructLayout(LayoutKind.Auto)]
         [WithDisabled(typeof(HasColorDefined))]
+        [WithNone(typeof(CoupleTag))]
         public partial struct ColorDefineJob : IJobEntity
         {
             [ReadOnly] public BlobAssetReference<ColorMapPositionsBlobAsset> colorData;
