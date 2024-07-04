@@ -184,7 +184,7 @@ namespace UI
                 if(!int.TryParse(text, out var count))
                     return;
                 
-                count = Mathf.Clamp(count, 1, _agentNumberLimit);
+                count = Mathf.Clamp(count, 1, 200000);
                 
                 _agentsNumberField.text = $"{count}";
                 _agentCount = count;
@@ -195,7 +195,7 @@ namespace UI
                 if(!int.TryParse(text, out var count))
                     return;
                 
-                count = Mathf.Clamp(count, 1, _groupNumberLimit);
+                count = Mathf.Clamp(count, _agentCount, 200000);
                 
                 _groupNumberField.text = $"{count}";
                 _agentsPerCouple = count;
@@ -358,7 +358,7 @@ namespace UI
             _settingsInfoText.text = "1: How many agents will be spawned in the simulation\n2: How many agents will be in one group (if coupling enabled).\n3: Seed that affects all random data (e.g colors, start position, end position)";
 
             _agentsNumberField.text = $"{_agentCount}";
-            _groupNumberField.text = $"{_agentsPerCouple}";
+            _groupNumberField.text = $"{Mathf.Clamp(_agentsPerCouple, 1, 200000)}";
             _seedField.text = $"{_seed}";
         }
 

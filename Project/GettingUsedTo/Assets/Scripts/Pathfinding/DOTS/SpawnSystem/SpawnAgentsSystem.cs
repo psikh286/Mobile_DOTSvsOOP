@@ -54,7 +54,6 @@ namespace Pathfinding.DOTS.SpawnSystem
             
             var totalAmountLeft = settings.agentsCount - totalAmountSpawned;
             var amountToSpawn = math.min(totalAmountLeft, 1000);
-            totalAmountSpawned += amountToSpawn;
             
             for (int i = 0; i < amountToSpawn; i++)
             {
@@ -65,16 +64,17 @@ namespace Pathfinding.DOTS.SpawnSystem
                 ecb.AddComponent(entity, new MovementData());
                 ecb.AddComponent(entity, new IndividualRandomData
                 {
-                    random = new Random((uint)(i + 1) * settings.seed),
-                    spriteRandom = new Random((uint)(i + 1) * settings.seed),
+                    random = new Random((uint)(totalAmountSpawned + i + 1) * settings.seed),
+                    spriteRandom = new Random((uint)(totalAmountSpawned + i + 1) * settings.seed),
                 });
                 
                 if (settings.allowCoupling) 
                     ecb.AddComponent(entity, new CoupleTag());
-
                 
                 ecb.AddBuffer<PathPosition>(entity);
             }
+            
+            totalAmountSpawned += amountToSpawn;
 
             ecb.Playback(state.EntityManager);
             ecb.Dispose();
