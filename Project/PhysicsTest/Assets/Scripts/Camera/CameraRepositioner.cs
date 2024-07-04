@@ -8,20 +8,13 @@ namespace PhysicsBenchmark.Camera
     {
         private void Start()
         {
-            float cubeSize = Mathf.Max(ClassicSettings.height, ClassicSettings.length);
+            var cubeSize = new Vector3(ClassicSettings.length, ClassicSettings.height, ClassicSettings.length);
             
-            float distance = cubeSize / 1.1547006f; 
+            var cubeDiagonal = Mathf.Sqrt(cubeSize.x * cubeSize.x + cubeSize.y * cubeSize.y + cubeSize.z * cubeSize.z);
 
-            distance *= 3f; 
+            var orthographicSize = cubeDiagonal / (2f * Mathf.Sqrt(3f) / 2f);
 
-            float angle = Mathf.Deg2Rad * 45f;
-            float x = distance * Mathf.Cos(angle);
-            float z = distance * Mathf.Sin(angle);
-
-            transform.position = new Vector3(x, distance, z);
-            transform.rotation = Quaternion.Euler(45, 45, 0);
-
-            transform.LookAt(Vector3.zero);
+            GetComponent<UnityEngine.Camera>().orthographicSize = orthographicSize;
         }
     }
 }

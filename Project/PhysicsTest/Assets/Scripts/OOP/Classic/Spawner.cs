@@ -2,7 +2,7 @@ using PhysicsBenchmark.DOTS.Classic.Spawner;
 using PhysicsBenchmark.Settings;
 using UnityEngine;
 
-namespace PhysicsBenchmark.OOP
+namespace PhysicsBenchmark.OOP.Classic
 {
     public class Spawner : MonoBehaviour
     {
@@ -25,10 +25,11 @@ namespace PhysicsBenchmark.OOP
         {
             var prefab = ClassicSettings.enableSphere ? _spherePrefab : _cubePrefab;
             var offset = (ClassicSettings.length - 1f) * 0.5f;
-            var height = ClassicSettings.heightOffset + ClassicSettings.height;
             
             for (int y = 0; y < ClassicSettings.height; y++)
             {
+                var height = ClassicSettings.heightOffset + y;
+                
                 for (int i = 0; i < ClassicSettings.length; i++)
                 {
                     var x = i - offset;
@@ -55,10 +56,11 @@ namespace PhysicsBenchmark.OOP
         {
             var prefab = ClassicSettings.enableSphere ? _spherePrefab : _cubePrefab;
             var offset = (ClassicSettings.length - 1f) * 0.5f;
-            var height = ClassicSettings.heightOffset + ClassicSettings.height;
             
             for (int y = 0; y < ClassicSettings.height; y++)
             {
+                var height = ClassicSettings.heightOffset + y;
+                
                 for (int i = 0; i < ClassicSettings.length; i++)
                 {
                     if ((y % 2 == 0 && i % 2 != 0) || (y % 2 != 0 && i % 2 == 0))

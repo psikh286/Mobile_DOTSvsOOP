@@ -34,7 +34,7 @@ namespace PhysicsBenchmark.DOTS.Classic.Spawner
                     var checkerboardJob = new CheckerboardJob
                     {
                         entityPrefab = entityPrefab,
-                        length = settings.length,
+                        length = (2 * settings.length) - 1,
                         heightOffset = settings.heightOffset,
                         ecb = ecb
                     };
