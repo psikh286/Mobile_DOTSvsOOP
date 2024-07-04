@@ -108,6 +108,10 @@ namespace UI
             }
             
             World.DefaultGameObjectInjectionWorld.Unmanaged.GetExistingSystemState<SpawnAgentsSystem>().Enabled = true;
+
+            _agentCount = PathfindingSettings.AgentsCount;
+            _agentsPerCouple = PathfindingSettings.AgentsPerCouple;
+            _seed = PathfindingSettings.Seed;
             
             _switchThemeButton.onClick.AddListener(OnSwitchTheme);
             
@@ -177,7 +181,14 @@ namespace UI
             
             _agentsNumberField.onValueChanged.AddListener(text =>
             {
+<<<<<<< Updated upstream
                 var count= Mathf.Clamp(int.Parse(text), 0, _agentNumberLimit);
+=======
+                if(!int.TryParse(text, out var count))
+                    return;
+                
+                count = Mathf.Clamp(count, 1, _agentNumberLimit);
+>>>>>>> Stashed changes
                 
                 _agentsNumberField.text = $"{count}";
                 _agentCount = count;
@@ -185,7 +196,10 @@ namespace UI
             
             _groupNumberField.onValueChanged.AddListener(text =>
             {
-                var count= Mathf.Clamp(int.Parse(text), 2, _groupNumberLimit);
+                if(!int.TryParse(text, out var count))
+                    return;
+                
+                count = Mathf.Clamp(count, 1, _groupNumberLimit);
                 
                 _groupNumberField.text = $"{count}";
                 _agentsPerCouple = count;
@@ -193,14 +207,15 @@ namespace UI
             
             _seedField.onValueChanged.AddListener(text =>
             {
-                uint seed = uint.Parse(text);
+               if(!uint.TryParse(text, out var seed))
+                   return;
 
-                if (seed == 0)
-                    seed = 1;
+               if (seed == 0)
+                   seed = 1;
                 
-                _seedField.text = $"{seed}";
+               _seedField.text = $"{seed}";
                 
-                _seed = seed;
+               _seed = seed;
             });
         }
         
@@ -284,7 +299,7 @@ namespace UI
             _settingsBackButtonParent.SetActive(false);
 
             _settingsHeaderText.text = "Architecture";
-            _settingsInfoText.text = "OOP - Object Oriented; DOTS - Data...";
+            _settingsInfoText.text = "<b>DOTS</b> is a data-oriented architecture that uses ESC as a core and minimizes the usage of reference types, to improve memory layout. It also allows the usage of multithreading.\n \n<b>Object-Oriented Programming(OOP)</b> is an architecture focused on creating objects that contain both data and functions.";
         }
 
         private void OnLocationOpened()
@@ -299,7 +314,7 @@ namespace UI
             _settingsBackButton.onClick.AddListener(OnSettingsOpened);
             
             _settingsHeaderText.text = "MOVING TYPE";
-            _settingsInfoText.text = "roads are narrow, water is open space";
+            _settingsInfoText.text = "<b>Cars</b>\n It acts as a maze by limiting walkable areas to narrow roads.\n \n<b>Boats</b>\nMinimize non-walkable areas resulting in a bigger open list size";
         }
 
         private void OnDiagonalOpened()
@@ -315,7 +330,7 @@ namespace UI
             _settingsBackButton.onClick.AddListener(OnLocationOpened);
             
             _settingsHeaderText.text = "Diagonals Allowed";
-            _settingsInfoText.text = "disables enables diogonal";
+            _settingsInfoText.text = "Allows/forbids diagonal movement";
         }
 
         private void OnCouplingOpened()
@@ -331,7 +346,7 @@ namespace UI
             _settingsBackButton.onClick.AddListener(OnDiagonalOpened);
             
             _settingsHeaderText.text = "Coupling Allowed";
-            _settingsInfoText.text = "coupling so multiple at one spot";
+            _settingsInfoText.text = "If enabled agents will be divided into groups with the same sprite, start node, and end node. Each agent is rendered and finds a path <b>separately.</b>\n<b>OOP</b>: No performance difference.\n<b>DOTS</b>: slight performance falloff:\nenabled - single-threaded (SystemAPI.Query);\ndisabled - multi-threaded (IJobEntity);";
         }
 
         private void OnLastPageOpened()
@@ -344,7 +359,7 @@ namespace UI
             _settingsBackButton.onClick.AddListener(OnCouplingOpened);
             
             _settingsHeaderText.text = "Settings";
-            _settingsInfoText.text = "1. Number: how many agents";
+            _settingsInfoText.text = "1: How many agents will be spawned in the simulation\n2: How many agents will be in one group (if coupling enabled).\n3: Seed that affects all random data (e.g colors, start position, end position)";
 
             _agentsNumberField.text = $"{_agentCount}";
             _groupNumberField.text = $"{_agentsPerCouple}";

@@ -2371,8 +2371,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 12
-    m_Right: 12
+    m_Left: 24
+    m_Right: 24
     m_Top: 12
     m_Bottom: 32
   m_ChildAlignment: 1
@@ -2727,7 +2727,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: about me
+  m_text: about project
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 45769cc902d6e47daaf4d6c0be41302a, type: 2}
   m_sharedMaterial: {fileID: -1628373970237570611, guid: 45769cc902d6e47daaf4d6c0be41302a,
@@ -3538,11 +3538,11 @@ MonoBehaviour:
     m_Left: 12
     m_Right: 12
     m_Top: 12
-    m_Bottom: 12
+    m_Bottom: 55
   m_ChildAlignment: 1
   m_Spacing: 12
   m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 0
+  m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 1
   m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
@@ -5022,7 +5022,7 @@ MonoBehaviour:
   _groupNumberField: {fileID: 2018582964}
   _seedField: {fileID: 1185905918}
   _actualPlayButton: {fileID: 663871328}
-  _agentNumberLimit: 1000000
+  _agentNumberLimit: 20000
   _groupNumberLimit: 1000
 --- !u!1 &1375044195
 GameObject:
@@ -7328,9 +7328,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: I'm a Game Programmer seeking an Internship. I specialize in Unity Engine
-    and C#, making exciting game mechanics, expandable systems, and designer-friendly
-    tools. I'm studying Game Design at UE in Germany.
+  m_text: This project is designed to test pathfinding performance of OOP and DOTs
+    architectures. This is a part of Bachelor project for University of Europe for
+    Applied Science of Alan Berberov.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 7f8bff21bc46e4ac888ee84cbfb3c663, type: 2}
   m_sharedMaterial: {fileID: 4987044446242151306, guid: 7f8bff21bc46e4ac888ee84cbfb3c663,
