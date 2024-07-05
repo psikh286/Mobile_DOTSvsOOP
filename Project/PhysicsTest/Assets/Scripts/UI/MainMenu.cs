@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace PhysicsBenchmark.UI
@@ -32,10 +33,16 @@ namespace PhysicsBenchmark.UI
         [Header("Tests")] 
         [SerializeField] private GameObject _testsParent;
         [SerializeField] private Button _classicButton;
+        [SerializeField] private Button _raycastButton;
         
 
         private void Awake()
         {
+            _raycastButton.onClick.AddListener(() =>
+            {
+                SceneManager.LoadScene(3);
+            });
+            
             _playButton.onClick.AddListener(() =>
             {
                 _mainMenuParent.SetActive(false);
@@ -46,6 +53,8 @@ namespace PhysicsBenchmark.UI
             {
                 _mainMenuParent.SetActive(true);
                 _testsParent.SetActive(false);
+                _infoParent.SetActive(false);
+                _creditsParent.SetActive(false);
                 _backToMainButtonParent.SetActive(false);
                 MenuTestSelectedEvent?.Invoke(TestIdentifier.None);
             });
@@ -72,6 +81,7 @@ namespace PhysicsBenchmark.UI
 
         private void OnDestroy()
         {
+            _raycastButton.onClick.RemoveAllListeners();
             _playButton.onClick.RemoveAllListeners();
             _backToMainButton.onClick.RemoveAllListeners();
             _infoButton.onClick.RemoveAllListeners();

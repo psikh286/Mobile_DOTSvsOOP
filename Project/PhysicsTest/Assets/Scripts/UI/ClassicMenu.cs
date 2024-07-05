@@ -133,7 +133,7 @@ namespace PhysicsBenchmark.UI
 
         private void UpdateCubeCount()
         {
-            _cubeCountText.text = "#" + CubeCountHelper.GetNumber();
+            _cubeCountText.text = (ClassicSettings.enableSphere ? "Spheres: " : "Cubes: ") + CubeCountHelper.GetNumber();
         }
 
         private void UpdateLengthAndHeight()

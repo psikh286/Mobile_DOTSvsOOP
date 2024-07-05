@@ -1,28 +1,38 @@
+using System;
+using System.Linq;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Physics;
-using UnityEngine;
+using Unity.Transforms;
 using RaycastHit = Unity.Physics.RaycastHit;
 
 namespace PhysicsBenchmark.DOTS.Raycasts
 {
     [BurstCompile]
-    public partial struct RaycastSystem : ISystem
+    public partial class RaycastSystem : SystemBase
     {
-        public void OnCreate(ref SystemState state)
-        {
-            state.RequireForUpdate<PhysicsWorldSingleton>();
-        }
+        public static event Action<RaycastResultInfo> RaycastCompleteEvent;
+        private Entity _entity;
         
-        [BurstCompile]
-        public void OnUpdate(ref SystemState state)
+        protected override void OnCreate()
         {
-            var collisionWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld;
+            base.OnCreate();
             
-            var rayResults = new NativeArray<RaycastHit>(100000, Allocator.TempJob);
+            RequireForUpdate<PhysicsWorldSingleton>();
+            RequireForUpdate<RaycastSettingsData>();
+            RequireForUpdate<RaycastSpawnData>();
+        }
+
+        protected override void OnUpdate()
+        {
+            Enabled = false;
+            
+            var collisionWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>().CollisionWorld;
+            var settings = SystemAPI.GetSingleton<RaycastSettingsData>();
+            var rayResults = new NativeArray<RaycastHit>(settings.count, Allocator.TempJob);
             
             var filter = new CollisionFilter()
             {
@@ -34,27 +44,33 @@ namespace PhysicsBenchmark.DOTS.Raycasts
             var input = new RaycastInput()
             {
                 Start = float3.zero,
-                End = new float3(0f, 2f, 0f),
+                End = new float3(1f * settings.distance, 0f, 0f),
                 Filter = filter
             };
             
-            var handle = ScheduleBatchRayCast(collisionWorld, input, rayResults, ref state);
+            var handle = ScheduleBatchRayCast(collisionWorld, input, rayResults, Dependency);
+            Dependency = handle;
             handle.Complete();
+            
+            RaycastCompleteEvent?.Invoke(new RaycastResultInfo()
+            {
+                successfulHits = rayResults.Count(r => r.Entity != Entity.Null)
+            });
             
             rayResults.Dispose();
         }
         
-        public static JobHandle ScheduleBatchRayCast(CollisionWorld world, RaycastInput input, NativeArray<RaycastHit> results, ref SystemState state)
+        #region Jobs
+        
+        public static JobHandle ScheduleBatchRayCast(CollisionWorld world, RaycastInput input, NativeArray<RaycastHit> results, JobHandle dependency)
         {
             var job = new RaycastJob
             {
                 input = input,
                 results = results,
                 world = world
+            }.ScheduleParallel(results.Length, 4, dependency);
 
-            }.ScheduleParallel(results.Length, 4, state.Dependency);
-
-            state.Dependency = job;
             return job;
         }
         
@@ -71,5 +87,7 @@ namespace PhysicsBenchmark.DOTS.Raycasts
                 results[index] = hit;
             }
         }
+        
+        #endregion
     }
 }
