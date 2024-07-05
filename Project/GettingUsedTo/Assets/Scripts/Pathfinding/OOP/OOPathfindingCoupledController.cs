@@ -130,11 +130,7 @@ namespace Pathfinding.OOP
                     _agents[i].path = path;
                 }
                     
-                var moveTo = Vector3.MoveTowards(_agents[i].spriteRenderer.transform.position, _agents[i].path[_agents[i].nodeCount], _carSpeed * Time.deltaTime);
-
-                _agents[i].spriteRenderer.flipX = moveTo.x < _agents[i].spriteRenderer.transform.position.x;
-                    
-                _agents[i].spriteRenderer.transform.position = moveTo;
+                _agents[i].spriteRenderer.transform.position = Vector3.MoveTowards(_agents[i].spriteRenderer.transform.position, _agents[i].path[_agents[i].nodeCount], _carSpeed * Time.deltaTime);
                     
                 if (_agents[i].spriteRenderer.transform.position == (Vector3)_agents[i].path[_agents[i].nodeCount])
                     _agents[i].nodeCount++;

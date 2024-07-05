@@ -8,7 +8,6 @@ using Pathfinding.DOTS.Grid;
 using Pathfinding.DOTS.MoveSystem;
 using Pathfinding.DOTS.Path;
 using Unity.Burst;
-
 namespace Pathfinding.DOTS.PathfindingSystem
 {
     [BurstCompile]
@@ -17,19 +16,19 @@ namespace Pathfinding.DOTS.PathfindingSystem
     {
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<GridData>();
+            state.RequireForUpdate<NewGridData>();
             state.RequireForUpdate<SettingsData>();
         }
 
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            var grid = SystemAPI.GetSingleton<GridData>();
+            var grid = SystemAPI.GetSingleton<NewGridData>();
             var settings = SystemAPI.GetSingleton<SettingsData>();
             
             var job = new PathfindingListJob()
             {
-                isWalkable = grid.blobAssetReference,
+                isWalkable = grid.isWalkable,
                 gridSize = grid.gridSize,
                 allowDiagonals = settings.allowDiagonal
             };
@@ -49,7 +48,8 @@ namespace Pathfinding.DOTS.PathfindingSystem
         public int2 gridSize;
         public bool allowDiagonals;
         
-        [ReadOnly] public BlobAssetReference<GridDataBlobAsset> isWalkable;
+        //[ReadOnly] public BlobAssetReference<GridDataBlobAsset> isWalkable;
+        [ReadOnly] public NativeArray<bool> isWalkable;
         
         [BurstCompile]
         public void Execute(in PathData pathData, ref DynamicBuffer<PathPosition> pathPositionBuffer, EnabledRefRW<ReachedFinish> reachedFinish)
@@ -137,7 +137,7 @@ namespace Pathfinding.DOTS.PathfindingSystem
         
                         PathNode neighbourNode = pathNodeArray[neighbourNodeIndex];
         
-                        if (!isWalkable.Value.isWalkable[neighbourNode.index]) 
+                        if (!isWalkable[neighbourNode.index]) 
                             continue;
                         
                         int2 currentNodePosition = new int2(currentNode.x, currentNode.y);

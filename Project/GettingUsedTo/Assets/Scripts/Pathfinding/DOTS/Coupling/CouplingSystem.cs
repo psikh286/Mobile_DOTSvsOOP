@@ -23,6 +23,9 @@ namespace Pathfinding.DOTS.Coupling
         {
             var settings = SystemAPI.GetSingleton<SettingsData>();
             var colorData = SystemAPI.GetSingleton<ColorMapPositionData>().blobAssetReference;
+            
+            if(!settings.allowCoupling)
+                return;
 
             int i = 0;
 
